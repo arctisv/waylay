@@ -14,8 +14,14 @@ export type DeviceSpecs = {
   shaderF16?: boolean;
 };
 
+/** Where the models run: the GPU through WebGPU, or the processor through
+ *  WebAssembly when there's no usable GPU. */
+export type Backend = "webgpu" | "cpu";
+
 export type SupportReport = {
   status: SupportStatus;
+  /** Set once the status is "ready". */
+  backend?: Backend;
   specs: DeviceSpecs;
 };
 

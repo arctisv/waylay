@@ -1,47 +1,34 @@
 "use client";
 
 import { db } from "./db";
-import { deleteCachedModel, isModelCached, unloadModel } from "./inference/engine";
+import { deleteCpuModel, isCpuModelCached } from "./inference/cpu-engine";
+import { unloadEngine } from "./inference/engine";
 import type { LocalModel } from "./inference/models";
+import { deleteWebgpuModel, isWebgpuModelCached } from "./inference/webgpu-engine";
 
 /* What Waylay keeps in this browser beyond the chats themselves: model
    downloads (in the Cache API, put there by WebLLM and Transformers.js)
    and the space they take. Everything here is local; deleting only frees
    space, and a deleted model downloads again the next time it's needed. */
 
-/* Transformers.js caches every model it fetches under this name. */
-const SPEECH_CACHE = "transformers-cache";
-
 const builds = (model: LocalModel) => [model.builds.f16, model.builds.f32];
 
-/** Whether either build of a chat model is downloaded. */
+/** Whether either build of a GPU chat model is downloaded. */
 export async function isModelDownloaded(model: LocalModel): Promise<boolean> {
-  const results = await Promise.all(builds(model).map(isModelCached));
+  const results = await Promise.all(builds(model).map(isWebgpuModelCached));
   return results.some(Boolean);
 }
 
 export async function deleteModelDownload(model: LocalModel): Promise<void> {
   for (const build of builds(model)) {
-    if (await isModelCached(build)) await deleteCachedModel(build);
+    if (await isWebgpuModelCached(build)) await deleteWebgpuModel(build);
   }
 }
 
-/** Whether the voice model (Whisper) is downloaded. */
-export async function isSpeechModelDownloaded(): Promise<boolean> {
-  if (typeof caches === "undefined") return false;
-  try {
-    if (!(await caches.has(SPEECH_CACHE))) return false;
-    const keys = await (await caches.open(SPEECH_CACHE)).keys();
-    return keys.some((request) => request.url.includes("whisper"));
-  } catch {
-    return false;
-  }
-}
-
-export async function deleteSpeechModel(): Promise<void> {
-  if (typeof caches === "undefined") return;
-  await caches.delete(SPEECH_CACHE);
-}
+/* Models fetched with Transformers.js — the processor chat model, voice
+   and pictures — are addressed by their Hugging Face repo. */
+export const isRepoDownloaded = isCpuModelCached;
+export const deleteRepoDownload = deleteCpuModel;
 
 /** Bytes this site uses and may use, when the browser says. */
 export async function storageEstimate(): Promise<{ usage: number; quota: number } | null> {
@@ -66,7 +53,7 @@ export async function requestPersistentStorage(): Promise<void> {
 
 /** Removes every chat, memory, setting and download, then starts fresh. */
 export async function eraseEverything(): Promise<void> {
-  await unloadModel().catch(() => {});
+  await unloadEngine().catch(() => {});
   await db.clearAll();
   if (typeof caches !== "undefined") {
     const names = await caches.keys();

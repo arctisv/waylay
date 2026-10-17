@@ -6,9 +6,10 @@ import { detectSupport } from "./detect-support";
 import { previewReports } from "./requirements";
 import type { SupportReport } from "./types";
 
-/* Whether this browser and device can run a model, checked once per page
-   load and shared by everything that asks. `?preview=browser|device` forces
-   an answer, for designing the unsupported states on a capable machine. */
+/* Whether — and where — this browser and device can run a model, checked
+   once per page load and shared by everything that asks.
+   `?preview=browser|device|cpu` forces an answer, for designing each state
+   on a capable machine. */
 
 const CHECKING: SupportReport = { status: "checking", specs: { webgpu: false } };
 
@@ -18,7 +19,9 @@ const listeners = new Set<() => void>();
 
 function readPreview(): SupportReport | null {
   const value = new URLSearchParams(window.location.search).get("preview");
-  return value === "browser" || value === "device" ? previewReports[value] : null;
+  return value === "browser" || value === "device" || value === "cpu"
+    ? previewReports[value]
+    : null;
 }
 
 function publish(report: SupportReport) {

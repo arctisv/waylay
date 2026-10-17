@@ -8,6 +8,8 @@ const COMPACT_KINDS = new Set([
   "thought",
   "calc",
   "memory",
+  /* Painting a picture: the activity line narrates it over the frame. */
+  "image",
 ]);
 
 /** Phases that belong inside the completed activity disclosure. */
@@ -66,6 +68,8 @@ export function phaseAction(
       return "Calculating";
     case "memory":
       return "Saving to memory";
+    case "image":
+      return phase.action?.trim() || "Painting a picture";
     default:
       return null;
   }
@@ -91,6 +95,8 @@ export function completedLabel(phase: MessagePhase): string {
           : "Calculated";
     case "memory":
       return "Saved to memory";
+    case "image":
+      return "Painted a picture";
     default:
       return "Finished a task";
   }

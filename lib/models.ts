@@ -1,6 +1,7 @@
 import {
   IconBarbellFilled,
   IconBoltFilled,
+  IconPhotoFilled,
   IconSparklesFilled,
   type Icon,
 } from "@tabler/icons-react";
@@ -11,7 +12,7 @@ import { IconBrainFilled } from "@/components/icons/brain-filled";
    device (lib/local/inference/models.ts maps each key to its download);
    the keys are what gets saved with a chat, so never rename them. */
 
-export type ChatModelKey = "Auto" | "Fast" | "Think" | "Max";
+export type ChatModelKey = "Auto" | "Fast" | "Think" | "Max" | "Image";
 
 export type ThinkingLevel = "none" | "low" | "medium" | "high";
 
@@ -87,6 +88,17 @@ export const CHAT_MODELS: ChatModel[] = [
     vision: false,
     files: false,
     imageOutput: false,
+    thinkingLevels: ["none"],
+    autoGates: false,
+  },
+  {
+    key: "Image",
+    name: "Image",
+    icon: IconPhotoFilled,
+    aliases: ["image", "picture", "paint", "draw", "janus", "janus pro", "deepseek"],
+    vision: false,
+    files: false,
+    imageOutput: true,
     thinkingLevels: ["none"],
     autoGates: false,
   },

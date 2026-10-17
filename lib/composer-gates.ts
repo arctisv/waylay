@@ -97,6 +97,7 @@ export function effectiveGates(
   model: ComposerModel | undefined,
   gates: ComposerGates,
 ): ComposerGates {
+  if (model?.imageOutput) return { thinking: "none" };
   if (model?.autoGates) return gates;
   return { thinking: clampThinking(model, gates.thinking) };
 }

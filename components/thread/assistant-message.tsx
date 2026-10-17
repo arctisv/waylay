@@ -7,6 +7,7 @@ import {
   IconCopy,
   IconPlayerStopFilled,
   IconRefresh,
+  IconVolume,
 } from "@tabler/icons-react";
 import { useQuery } from "@/lib/local/react";
 import { api } from "@/lib/local/api";
@@ -27,8 +28,10 @@ import {
 } from "@/lib/messages";
 import { buildMessageRenderPlan } from "@/lib/message-render-plan";
 import { isCompactPhase } from "@/lib/phase-activity";
+import { toggleReadAloud, useCanReadAloud, useReadingAloud } from "@/lib/read-aloud";
 import { useTypewriter } from "@/lib/use-typewriter";
 import { CheckpointMenu } from "./checkpoint-menu";
+import { GeneratedImageSlot } from "./generated-image";
 import { Markdown } from "./markdown";
 import { MessageActionButton } from "./message-action-button";
 import { MessageStats } from "./message-stats";
@@ -113,22 +116,34 @@ export function AssistantMessage({
 
   const streamingNow = !terminal && !error;
   const showText = !error && text.length > 0;
+  /* A picture reply paints in its own frame (GeneratedImageSlot), which
+     carries the painting's progress — so that phase stays out of the
+     activity line, which only narrates the model download. */
+  const imageTurn = message.model === "Image" && !error;
+  const phases = useMemo(
+    () =>
+      imageTurn
+        ? (message.phases ?? []).filter((phase) => phase.kind !== "image")
+        : (message.phases ?? []),
+    [imageTurn, message.phases],
+  );
+  const paintingNow = imageTurn && phases.length === 0;
   /* Once compact tool work begins, its activity stays in progress through
      inter-call gaps. Only the terminal message update settles the summary. */
   const {
     active: activityActive,
     settled: activitySettled,
   } = assistantActivityState({
-    phases: message.phases ?? [],
+    phases,
     terminal,
     canShowActivity: streamingNow,
     showText,
-    richerActivityWorking: false,
+    richerActivityWorking: paintingNow,
   });
   const renderableText = error ? "" : text;
   const renderPlan = useMemo(
-    () => buildMessageRenderPlan(renderableText, message.phases ?? []),
-    [message.phases, renderableText],
+    () => buildMessageRenderPlan(renderableText, phases),
+    [phases, renderableText],
   );
   const hasCompactItems = renderPlan.some(
     (item) =>
@@ -180,7 +195,7 @@ export function AssistantMessage({
       }
     >
       <PhaseActivity
-        phases={ownedPhases ?? message.phases ?? []}
+        phases={ownedPhases ?? phases}
         status={message.status}
         thinking={message.thinking === true}
         active={(ownedItem ? ownedIsTrailing : true) && activityActive}
@@ -253,6 +268,7 @@ export function AssistantMessage({
       className="group/msg flex w-full min-w-0 flex-col items-start"
     >
       {planChildren}
+      {imageTurn && <GeneratedImageSlot message={message} />}
       {error && <ErrorBanner error={error} onRetry={onRetry} />}
       {message.status === "stopped" && (
         <div className="mt-2 flex items-center gap-1.5 text-[13px]/4 font-medium text-muted-foreground">
@@ -328,6 +344,8 @@ function MessageActions({
   const [copied, setCopied] = useState(false);
   const text = message.content;
   const canCopy = text.length > 0;
+  const canSpeak = useCanReadAloud() && canCopy;
+  const reading = useReadingAloud(message.id);
   const hasStats =
     message.outputTokens !== undefined || message.durationMs !== undefined;
   if (!canCopy && !onRetry && !onBranch && !hasStats) return null;
@@ -351,6 +369,14 @@ function MessageActions({
           }}
         >
           {copied ? <IconCheck size={15} /> : <IconCopy size={15} />}
+        </MessageActionButton>
+      )}
+      {canSpeak && (
+        <MessageActionButton
+          label={reading ? "Stop reading" : "Read aloud"}
+          onClick={() => toggleReadAloud(message.id, text)}
+        >
+          {reading ? <IconPlayerStopFilled size={13} /> : <IconVolume size={15} />}
         </MessageActionButton>
       )}
       {onRetry && (

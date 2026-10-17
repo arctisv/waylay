@@ -1,11 +1,23 @@
 "use client";
 
-import type { MLCEngineInterface } from "@mlc-ai/web-llm";
+import {
+  interruptCpu,
+  isCpuModelLoaded,
+  loadCpu,
+  unloadCpu,
+} from "./cpu-engine";
+import { unloadImageModel } from "./image-engine";
+import type { Runtime } from "./models";
+import {
+  interruptWebgpu,
+  isWebgpuModelLoaded,
+  loadWebgpu,
+  unloadWebgpu,
+} from "./webgpu-engine";
 
-/* The one model engine for the tab. It runs in a Web Worker so loading and
-   generating never block the page, holds a single model at a time, and
-   swaps models on demand. The library is imported on first use, so a page
-   that never chats never downloads it. */
+/* The one model engine for the tab, whichever backend runs it: WebLLM on
+   the GPU, or Transformers.js on the processor (models.ts picks). Loads
+   run one at a time, and only one backend holds a model at once. */
 
 export type LoadProgress = {
   /** 0 to 1. */
@@ -14,91 +26,65 @@ export type LoadProgress = {
   cached: boolean;
 };
 
-let engine: Promise<MLCEngineInterface> | null = null;
-let worker: Worker | null = null;
-let loadedModel: string | null = null;
-/* Model loads run one at a time; a second request waits for the first. */
-let loadChain: Promise<unknown> = Promise.resolve();
+export type EngineMessage = {
+  role: "system" | "user" | "assistant";
+  content: string;
+};
 
-function webllm() {
-  return import("@mlc-ai/web-llm");
+export type GenerateRequest = {
+  messages: EngineMessage[];
+  maxTokens: number;
+  temperature: number;
+  topP?: number;
+  /** For reasoning models: think first, or answer straight away. */
+  enableThinking?: boolean;
+  /** Called with the reply so far each time it grows. */
+  onText?: (text: string) => void;
+};
+
+export type GenerateResult = { text: string; completionTokens?: number };
+
+export type ChatEngine = {
+  generate(request: GenerateRequest): Promise<GenerateResult>;
+};
+
+let active: Runtime["backend"] | null = null;
+let chain: Promise<unknown> = Promise.resolve();
+
+export function isRuntimeLoaded(runtime: Runtime): boolean {
+  return runtime.backend === "webgpu"
+    ? isWebgpuModelLoaded(runtime.id)
+    : isCpuModelLoaded(runtime.id);
 }
 
-/* Created empty; loadModel() below loads a model into it with progress. */
-async function createEngine(): Promise<MLCEngineInterface> {
-  const { WebWorkerMLCEngine } = await webllm();
-  worker = new Worker(new URL("./llm.worker.ts", import.meta.url), {
-    type: "module",
-  });
-  return new WebWorkerMLCEngine(worker);
-}
-
-/** Whether a model's files are already in the browser cache. */
-export async function isModelCached(modelId: string): Promise<boolean> {
-  try {
-    const { hasModelInCache } = await webllm();
-    return await hasModelInCache(modelId);
-  } catch {
-    return false;
-  }
-}
-
-/** Frees a model's downloaded files. */
-export async function deleteCachedModel(modelId: string): Promise<void> {
-  const { deleteModelAllInfoInCache } = await webllm();
-  if (loadedModel === modelId) await unloadModel();
-  await deleteModelAllInfoInCache(modelId);
-}
-
-/** Loads a model (downloading it the first time) and returns the engine. */
-export function loadModel(
-  modelId: string,
+/** Loads a runtime's model (downloading it the first time). */
+export function loadRuntime(
+  runtime: Runtime,
   onProgress?: (progress: LoadProgress) => void,
-): Promise<MLCEngineInterface> {
+): Promise<ChatEngine> {
   const run = async () => {
-    if (!engine) {
-      engine = createEngine();
-      engine.catch(() => {
-        engine = null;
-        worker?.terminate();
-        worker = null;
-      });
-    }
-    const instance = await engine;
-    if (loadedModel === modelId) return instance;
-
-    const cached = await isModelCached(modelId);
-    /* A first download is hundreds of megabytes; ask the browser to keep it. */
-    if (!cached) void navigator.storage?.persist?.().catch(() => false);
-    onProgress?.({ value: 0, cached });
-    instance.setInitProgressCallback((report) =>
-      onProgress?.({ value: report.progress, cached }),
-    );
-    loadedModel = null;
-    await instance.reload(modelId);
-    loadedModel = modelId;
-    return instance;
+    /* One big model in memory at a time: the picture model steps aside. */
+    unloadImageModel();
+    if (active && active !== runtime.backend) await unloadEngine();
+    active = runtime.backend;
+    return runtime.backend === "webgpu"
+      ? loadWebgpu(runtime.id, onProgress)
+      : loadCpu(runtime.id, runtime.dtype, onProgress);
   };
-  const next = loadChain.then(run, run);
-  loadChain = next.catch(() => undefined);
+  const next = chain.then(run, run);
+  chain = next.catch(() => undefined);
   return next;
-}
-
-export function isModelLoaded(modelId: string): boolean {
-  return loadedModel === modelId;
 }
 
 /** Stops whatever the engine is writing. Safe to call when it's idle. */
 export async function interruptGeneration(): Promise<void> {
-  if (!engine) return;
-  const instance = await engine.catch(() => null);
-  await instance?.interruptGenerate();
+  if (active === "webgpu") await interruptWebgpu();
+  else if (active === "cpu") interruptCpu();
 }
 
-/** Releases the model from GPU memory. */
-export async function unloadModel(): Promise<void> {
-  if (!engine) return;
-  const instance = await engine.catch(() => null);
-  await instance?.unload();
-  loadedModel = null;
+/** Releases the loaded model, wherever it lives. */
+export async function unloadEngine(): Promise<void> {
+  if (active === "webgpu") await unloadWebgpu();
+  else if (active === "cpu") unloadCpu();
+  active = null;
 }

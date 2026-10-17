@@ -7,6 +7,7 @@ import {
   IconCalculator,
   IconChevronDown,
   IconChevronRight,
+  IconPhoto,
   IconStack2,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -53,6 +54,8 @@ function ActivityGlyph({
       return <IconCalculator size={size} stroke={2} />;
     case "memory":
       return <IconBookmark size={size} stroke={2} />;
+    case "image":
+      return <IconPhoto size={size} stroke={2} />;
     default:
       return null;
   }
@@ -60,7 +63,7 @@ function ActivityGlyph({
 
 /* Getting the model ready has no glyph of its own: it wears the spinning
    mark, like any other wait. */
-const GLYPH_KINDS = new Set(["thought", "calc", "memory"]);
+const GLYPH_KINDS = new Set(["thought", "calc", "memory", "image"]);
 
 /** The assistant turn's one activity surface. Before prose arrives it stays
  * mounted as the large current-phase indicator. Once the reply becomes

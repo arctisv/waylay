@@ -11,13 +11,30 @@
  * the network can't answer does the stored copy step in. Model downloads
  * come from other origins and are left alone; their own cache holds them.
  *
+ * It also makes the page cross-origin isolated by adding the two headers
+ * static hosts can't: that unlocks multi-threaded WebAssembly, which the
+ * processor model and voice input run several times faster with. It takes
+ * effect from the second visit, once the worker controls the page.
+ *
  * Bump CACHE to drop every stored copy on the next activation.
  */
 
-const CACHE = "waylay-shell-v1";
+const CACHE = "waylay-shell-v2";
 
 /* The worker's scope is the app's base ("/" or "/waylay/"). */
 const BASE = new URL(self.registration.scope).pathname;
+
+/** The page with the isolation headers added. */
+function isolated(response) {
+  const headers = new Headers(response.headers);
+  headers.set("Cross-Origin-Opener-Policy", "same-origin");
+  headers.set("Cross-Origin-Embedder-Policy", "require-corp");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -62,6 +79,7 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(
     (async () => {
+      const navigation = request.mode === "navigate";
       try {
         const response = await fetch(request);
         /* Only keep what arrived intact — an errored response stored here
@@ -70,16 +88,15 @@ self.addEventListener("fetch", (event) => {
           const cache = await caches.open(CACHE);
           /* Every route is the same page (the path after # never reaches
              the server), so navigations share one entry. */
-          const key = request.mode === "navigate" ? BASE : request;
+          const key = navigation ? BASE : request;
           cache.put(key, response.clone());
         }
-        return response;
+        return navigation ? isolated(response) : response;
       } catch (error) {
-        const cached = await caches.match(
-          request.mode === "navigate" ? BASE : request,
-          { ignoreSearch: request.mode === "navigate" },
-        );
-        if (cached) return cached;
+        const cached = await caches.match(navigation ? BASE : request, {
+          ignoreSearch: navigation,
+        });
+        if (cached) return navigation ? isolated(cached) : cached;
         throw error;
       }
     })(),

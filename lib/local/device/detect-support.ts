@@ -1,38 +1,32 @@
 import { requirements } from "./requirements";
 import type { DeviceSpecs, NavigatorWithGpu, SupportReport } from "./types";
 
-/** Checks whether this browser and device can run a model locally with WebGPU. */
+/** Checks where this browser and device can run a model: on the GPU with
+ *  WebGPU, on the processor with WebAssembly, or not at all. */
 export async function detectSupport(): Promise<SupportReport> {
   const nav = navigator as NavigatorWithGpu;
-
-  if (!nav.gpu) {
-    return { status: "unsupported-browser", specs: { webgpu: false } };
-  }
-
-  const adapter = await nav.gpu
-    .requestAdapter({ powerPreference: "high-performance" })
-    .catch(() => null);
+  const adapter = nav.gpu
+    ? await nav.gpu.requestAdapter({ powerPreference: "high-performance" }).catch(() => null)
+    : null;
   const specs: DeviceSpecs = {
-    webgpu: true,
+    webgpu: Boolean(nav.gpu),
     memoryGB: nav.deviceMemory,
     gpuBufferMB: adapter ? adapter.limits.maxBufferSize / 2 ** 20 : undefined,
     shaderF16: adapter?.features.has("shader-f16"),
   };
 
-  return {
-    status: isCapable(specs, Boolean(adapter)) ? "ready" : "unsupported-device",
-    specs,
-  };
+  if (adapter && gpuCapable(specs)) return { status: "ready", backend: "webgpu", specs };
+  if (typeof WebAssembly !== "object") return { status: "unsupported-browser", specs };
+  if (specs.memoryGB !== undefined && specs.memoryGB < requirements.minCpuMemoryGB) {
+    return { status: "unsupported-device", specs };
+  }
+  return { status: "ready", backend: "cpu", specs };
 }
 
-function isCapable(specs: DeviceSpecs, hasAdapter: boolean): boolean {
-  if (!hasAdapter) return false;
-  if (specs.memoryGB !== undefined && specs.memoryGB < requirements.minMemoryGB)
+function gpuCapable(specs: DeviceSpecs): boolean {
+  if (specs.memoryGB !== undefined && specs.memoryGB < requirements.minMemoryGB) return false;
+  if (specs.gpuBufferMB !== undefined && specs.gpuBufferMB < requirements.minGpuBufferMB) {
     return false;
-  if (
-    specs.gpuBufferMB !== undefined &&
-    specs.gpuBufferMB < requirements.minGpuBufferMB
-  )
-    return false;
+  }
   return true;
 }

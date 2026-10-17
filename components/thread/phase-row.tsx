@@ -7,6 +7,7 @@ import {
   IconCalculator,
   IconChevronDown,
   IconCpu,
+  IconPhoto,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 
@@ -25,6 +26,8 @@ function PhaseGlyph({ kind }: { kind: string }) {
       return <IconCalculator size={15} stroke={2} />;
     case "memory":
       return <IconBookmark size={15} stroke={2} />;
+    case "image":
+      return <IconPhoto size={15} stroke={2} />;
     default:
       return <IconCpu size={15} stroke={2} />;
   }

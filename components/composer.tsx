@@ -566,7 +566,9 @@ export function Composer({
                         });
                       }
                     }}
-                    placeholder={placeholder}
+                    placeholder={
+                      currentModel?.imageOutput ? "Describe a picture to paint" : placeholder
+                    }
                     className="relative block h-full w-full resize-none overflow-y-auto bg-transparent px-1.5 py-1.5 field-text caret-foreground outline-none placeholder:text-muted-foreground"
                   />
                 </motion.div>

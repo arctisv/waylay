@@ -5,6 +5,7 @@ import {
   IconCheck,
   IconCircleCheckFilled,
   IconDots,
+  IconDownload,
   IconFolderFilled,
   IconFolderMinus,
   IconFolderPlus,
@@ -36,7 +37,8 @@ import {
   useFolderActions,
   type FolderSummary,
 } from "@/lib/folders";
-import { runMutation as run } from "@/lib/toasts";
+import { exportThreadAsMarkdown } from "@/lib/export-thread";
+import { runMutation as run, showToast } from "@/lib/toasts";
 import { useThreadActions, type ThreadSummary } from "@/lib/threads";
 import { useView } from "@/lib/view";
 import { RenameDialog } from "./rename-dialog";
@@ -264,6 +266,18 @@ export const ThreadRow = memo(function ThreadRow({
           >
             <IconSparklesFilled size={15} className={ICON} />
             Regenerate title
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            className={ITEM}
+            onClick={() =>
+              void exportThreadAsMarkdown(thread.id, title).catch(() =>
+                showToast("Couldn't export that chat. Try again."),
+              )
+            }
+          >
+            <IconDownload size={15} className={ICON} />
+            Export as Markdown
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />

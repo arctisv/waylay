@@ -1,21 +1,28 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { IconMicrophoneFilled } from "@tabler/icons-react";
+import {
+  IconCpu,
+  IconMicrophoneFilled,
+  IconPhotoFilled,
+  type Icon,
+} from "@tabler/icons-react";
 
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { api } from "@/lib/local/api";
-import { LOCAL_MODELS } from "@/lib/local/inference/models";
+import { IMAGE_MODEL } from "@/lib/local/inference/image-engine";
+import { CPU_MODEL, LOCAL_MODELS, type TextModelKey } from "@/lib/local/inference/models";
 import { useMutation } from "@/lib/local/react";
+import { SPEECH_MODEL } from "@/lib/local/speech/model";
 import {
   deleteModelDownload,
-  deleteSpeechModel,
+  deleteRepoDownload,
   eraseEverything,
   formatBytes,
   isModelDownloaded,
-  isSpeechModelDownloaded,
+  isRepoDownloaded,
   storageEstimate,
 } from "@/lib/local/storage";
 import { CHAT_MODELS } from "@/lib/models";
@@ -28,42 +35,104 @@ import {
   SettingsRow,
 } from "./settings-rows";
 
-type ModelKey = keyof typeof LOCAL_MODELS;
+/** One downloadable model, as the Downloads card lists it. */
+type Download = {
+  key: string;
+  icon: Icon;
+  title: string;
+  /** Short name for the delete button's label. */
+  name: string;
+  sizeMB: number;
+  isDownloaded: () => Promise<boolean>;
+  remove: () => Promise<void>;
+};
 
-const MODEL_KEYS = Object.keys(LOCAL_MODELS) as ModelKey[];
+const TEXT_KEYS = Object.keys(LOCAL_MODELS) as TextModelKey[];
+
+const DOWNLOADS: Download[] = [
+  ...TEXT_KEYS.map((key): Download => {
+    const local = LOCAL_MODELS[key];
+    const chatModel = CHAT_MODELS.find((model) => model.key === key)!;
+    return {
+      key,
+      icon: chatModel.icon,
+      title: `${chatModel.name} · ${local.label}`,
+      name: chatModel.name,
+      sizeMB: local.downloadMB,
+      isDownloaded: () => isModelDownloaded(local),
+      remove: () => deleteModelDownload(local),
+    };
+  }),
+  {
+    key: "image",
+    icon: IconPhotoFilled,
+    title: `Image · ${IMAGE_MODEL.label}`,
+    name: "image model",
+    sizeMB: IMAGE_MODEL.downloadMB,
+    isDownloaded: () => isRepoDownloaded(IMAGE_MODEL.repo),
+    remove: () => deleteRepoDownload(IMAGE_MODEL.repo),
+  },
+  {
+    key: "cpu",
+    icon: IconCpu,
+    title: `Processor · ${CPU_MODEL.label}`,
+    name: "processor model",
+    sizeMB: CPU_MODEL.downloadMB,
+    isDownloaded: () => isRepoDownloaded(CPU_MODEL.repo),
+    remove: () => deleteRepoDownload(CPU_MODEL.repo),
+  },
+  {
+    key: "voice",
+    icon: IconMicrophoneFilled,
+    title: `Voice · ${SPEECH_MODEL.label}`,
+    name: "voice model",
+    sizeMB: SPEECH_MODEL.downloadMB,
+    isDownloaded: () => isRepoDownloaded(SPEECH_MODEL.repo),
+    remove: () => deleteRepoDownload(SPEECH_MODEL.repo),
+  },
+];
+
+/** Which models are on the device, and how much space the site uses. */
+async function readStorage() {
+  const [states, usage] = await Promise.all([
+    Promise.all(DOWNLOADS.map((download) => download.isDownloaded())),
+    storageEstimate(),
+  ]);
+  return {
+    downloaded: Object.fromEntries(
+      DOWNLOADS.map((download, index) => [download.key, states[index]]),
+    ) as Record<string, boolean>,
+    usage,
+  };
+}
 
 /* Downloads and data, all of it in this browser. Each model shows whether
    it's on the device and can be deleted to free space — it downloads again
-   the next time someone picks it. */
+   the next time it's needed. */
 export function StorageSection() {
-  const [downloaded, setDownloaded] = useState<Partial<Record<ModelKey | "voice", boolean>>>({});
+  const [downloaded, setDownloaded] = useState<Record<string, boolean>>({});
   const [usage, setUsage] = useState<{ usage: number; quota: number } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<"chats" | "everything" | null>(null);
   const deleteAllChats = useMutation(api.threads.deleteAll);
 
-  const refresh = useCallback(async () => {
-    const [models, voice, estimate] = await Promise.all([
-      Promise.all(MODEL_KEYS.map((key) => isModelDownloaded(LOCAL_MODELS[key]))),
-      isSpeechModelDownloaded(),
-      storageEstimate(),
-    ]);
-    setDownloaded({
-      ...Object.fromEntries(MODEL_KEYS.map((key, index) => [key, models[index]])),
-      voice,
-    });
-    setUsage(estimate);
-  }, []);
+  const refresh = useCallback(
+    () =>
+      readStorage().then((next) => {
+        setDownloaded(next.downloaded);
+        setUsage(next.usage);
+      }),
+    [],
+  );
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
-  const remove = async (key: ModelKey | "voice") => {
-    setBusy(key);
+  const remove = async (download: Download) => {
+    setBusy(download.key);
     try {
-      if (key === "voice") await deleteSpeechModel();
-      else await deleteModelDownload(LOCAL_MODELS[key]);
+      await download.remove();
       await refresh();
     } catch {
       showToast("Couldn't delete that download. Try again.");
@@ -72,21 +141,22 @@ export function StorageSection() {
     }
   };
 
-  const status = (key: ModelKey | "voice", size: string) => {
-    const state = downloaded[key];
+  const status = (download: Download) => {
+    const size = formatBytes(download.sizeMB * 1024 * 1024);
+    const state = downloaded[download.key];
     if (state === undefined) return size;
     return state ? `${size} · On this device` : `${size} · Downloads when used`;
   };
 
-  const removeControl = (key: ModelKey | "voice", label: string) => {
-    if (busy === key) return <Spinner />;
-    if (!downloaded[key]) return null;
+  const removeControl = (download: Download) => {
+    if (busy === download.key) return <Spinner />;
+    if (!downloaded[download.key]) return null;
     return (
       <ArmRemoveButton
-        label={label}
+        label={download.name}
         confirmLabel="Delete?"
         disabled={busy !== null}
-        onRemove={() => void remove(key)}
+        onRemove={() => void remove(download)}
       />
     );
   };
@@ -108,25 +178,15 @@ export function StorageSection() {
             }
           />
           <SettingsCard>
-            {MODEL_KEYS.map((key) => {
-              const local = LOCAL_MODELS[key];
-              const chatModel = CHAT_MODELS.find((model) => model.key === key)!;
-              return (
-                <SettingsRow
-                  key={key}
-                  icon={chatModel.icon}
-                  title={`${chatModel.name} · ${local.label}`}
-                  description={status(key, formatBytes(local.downloadMB * 1024 * 1024))}
-                  control={removeControl(key, chatModel.name)}
-                />
-              );
-            })}
-            <SettingsRow
-              icon={IconMicrophoneFilled}
-              title="Voice · Whisper Base"
-              description={status("voice", "80 MB")}
-              control={removeControl("voice", "voice model")}
-            />
+            {DOWNLOADS.map((download) => (
+              <SettingsRow
+                key={download.key}
+                icon={download.icon}
+                title={download.title}
+                description={status(download)}
+                control={removeControl(download)}
+              />
+            ))}
           </SettingsCard>
         </div>
 

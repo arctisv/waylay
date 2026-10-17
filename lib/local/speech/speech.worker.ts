@@ -6,7 +6,9 @@ import {
   type AutomaticSpeechRecognitionPipeline,
 } from "@huggingface/transformers";
 
-const MODEL = "onnx-community/whisper-base";
+import { SPEECH_MODEL } from "./model";
+
+const MODEL = SPEECH_MODEL.repo;
 
 type Request = { id: number; audio: Float32Array };
 
