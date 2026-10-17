@@ -1,56 +1,60 @@
-// Generates every icon size from the brand SVGs in src/assets/brand.
-// Run with `npm run icons` after changing the logo, then commit the output.
-import { copyFile, readFile, writeFile } from 'node:fs/promises';
-import sharp from 'sharp';
+// Renders the app icons and the social card from the mark in
+// public/brand/mark.svg: the white mark centered on a dark canvas.
+// Run with `npm run icons` after changing the mark, then commit the output.
+import { readFile, writeFile } from "node:fs/promises";
+import sharp from "sharp";
 
-const root = new URL('../', import.meta.url);
+const root = new URL("../", import.meta.url);
 const path = (p) => new URL(p, root);
 
-const rounded = await readFile(path('src/assets/brand/app-icon.svg'));
-const fullBleed = await readFile(path('src/assets/brand/app-icon-full-bleed.svg'));
+const BACKGROUND = "#161616";
+const mark = (await readFile(path("public/brand/mark.svg"), "utf8")).replaceAll(
+  "black",
+  "white",
+);
 
-const png = (svg, size) => sharp(svg, { density: 72 * (size / 100) * 2 }).resize(size, size).png().toBuffer();
+/** A square icon with the mark filling `scale` of its width. */
+async function icon(size, scale) {
+  const markSize = Math.round(size * scale);
+  const art = await sharp(Buffer.from(mark), { density: 72 * (markSize / 180) * 2 })
+    .resize(markSize, markSize, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png()
+    .toBuffer();
+  return sharp({
+    create: { width: size, height: size, channels: 4, background: BACKGROUND },
+  })
+    .composite([{ input: art, gravity: "center" }])
+    .png()
+    .toBuffer();
+}
 
-// Packs PNG images into a single .ico file (PNG-compressed entries, supported by every current browser).
-function toIco(images) {
-  const header = Buffer.alloc(6);
-  header.writeUInt16LE(0, 0);
-  header.writeUInt16LE(1, 2);
-  header.writeUInt16LE(images.length, 4);
-
-  const entries = [];
-  let offset = 6 + images.length * 16;
-  for (const { size, data } of images) {
-    const entry = Buffer.alloc(16);
-    entry.writeUInt8(size >= 256 ? 0 : size, 0);
-    entry.writeUInt8(size >= 256 ? 0 : size, 1);
-    entry.writeUInt8(0, 2);
-    entry.writeUInt8(0, 3);
-    entry.writeUInt16LE(1, 4);
-    entry.writeUInt16LE(32, 6);
-    entry.writeUInt32LE(data.length, 8);
-    entry.writeUInt32LE(offset, 12);
-    entries.push(entry);
-    offset += data.length;
-  }
-  return Buffer.concat([header, ...entries, ...images.map((i) => i.data)]);
+/** The link-preview card: the mark on a deep diagonal gradient. */
+async function socialCard() {
+  const background = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#0d5aa6"/>
+      </linearGradient></defs>
+      <rect width="1200" height="630" fill="url(#g)"/>
+    </svg>`,
+  );
+  const art = await sharp(Buffer.from(mark), { density: 144 })
+    .resize(180, 180, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png()
+    .toBuffer();
+  return sharp(background).composite([{ input: art, gravity: "center" }]).png().toBuffer();
 }
 
 const outputs = [
-  ['public/icons/icon-192.png', await png(rounded, 192)],
-  ['public/icons/icon-512.png', await png(rounded, 512)],
-  ['public/icons/icon-maskable-512.png', await png(fullBleed, 512)],
-  ['src/app/apple-icon.png', await png(fullBleed, 180)],
-  [
-    'src/app/favicon.ico',
-    toIco(await Promise.all([16, 32, 48].map(async (size) => ({ size, data: await png(rounded, size) })))),
-  ],
+  ["public/icons/icon-192.png", await icon(192, 0.5)],
+  ["public/icons/icon-512.png", await icon(512, 0.5)],
+  /* Pulled in far enough to survive any crop Android applies. */
+  ["public/icons/icon-maskable-512.png", await icon(512, 0.4)],
+  ["app/apple-icon.png", await icon(180, 0.5)],
+  ["public/brand/og.png", await socialCard()],
 ];
 
 for (const [file, data] of outputs) {
   await writeFile(path(file), data);
   console.log(`wrote ${file}`);
 }
-
-await copyFile(path('src/assets/brand/app-icon.svg'), path('src/app/icon.svg'));
-console.log('wrote src/app/icon.svg');

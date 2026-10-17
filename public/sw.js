@@ -1,64 +1,87 @@
-// Waylay service worker: keeps the app shell available offline.
-// Bump the version when the caching rules change, so old caches are cleared.
-const CACHE = 'waylay-shell-v1';
-const STATIC_FILES = ['/manifest.webmanifest', '/icon.svg', '/favicon.ico', '/icons/icon-192.png', '/icons/icon-512.png'];
+/* Waylay's service worker: the app works offline.
+ *
+ * Everything Waylay needs lives in this browser already — the chats in
+ * IndexedDB, the models in the Cache API — so the only thing standing
+ * between a dead connection and a working app is the page itself. This
+ * worker keeps a copy of the page and its assets as they load.
+ *
+ * Network first, always: online, every request goes to the network and the
+ * copy is refreshed on the way back, so a deploy is picked up on the next
+ * load and one build's markup never meets another build's chunks. Only when
+ * the network can't answer does the stored copy step in. Model downloads
+ * come from other origins and are left alone; their own cache holds them.
+ *
+ * Bump CACHE to drop every stored copy on the next activation.
+ */
 
-// Caches the page plus every build asset it references, so the next visit works with no network.
-async function precache() {
-  const cache = await caches.open(CACHE);
-  const response = await fetch('/', { cache: 'reload' });
-  const html = await response.clone().text();
-  await cache.put('/', response);
-  const assets = new Set(html.match(/\/_next\/static\/[^"'\s)\\]+/g) ?? []);
-  await cache.addAll([...STATIC_FILES, ...assets]);
-}
+const CACHE = "waylay-shell-v1";
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(precache().then(() => self.skipWaiting()));
-});
+/* The worker's scope is the app's base ("/" or "/waylay/"). */
+const BASE = new URL(self.registration.scope).pathname;
 
-self.addEventListener('activate', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
-      .then(() => self.clients.claim()),
+    (async () => {
+      const cache = await caches.open(CACHE);
+      try {
+        await cache.add(new Request(BASE, { cache: "reload" }));
+      } catch {
+        // Offline at install time; the fetch path fills the cache later.
+      }
+      await self.skipWaiting();
+    })(),
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  if (request.method !== 'GET') return;
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      const names = await caches.keys();
+      await Promise.all(
+        names
+          .filter((name) => name.startsWith("waylay-") && name !== CACHE)
+          .map((name) => caches.delete(name)),
+      );
+      await self.clients.claim();
+    })(),
+  );
+});
 
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+  if (request.method !== "GET") return;
 
-  // Pages: try the network for the latest version, fall back to the cached shell when offline.
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put('/', copy));
-          return response;
-        })
-        .catch(() => caches.match('/')),
-    );
+  let url;
+  try {
+    url = new URL(request.url);
+  } catch {
     return;
   }
+  if (url.origin !== self.location.origin) return;
+  if (!url.pathname.startsWith(BASE)) return;
 
-  // Build assets have content hashes in their names, so a cached copy is always correct.
   event.respondWith(
-    caches.match(request).then(
-      (cached) =>
-        cached ??
-        fetch(request).then((response) => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        }),
-    ),
+    (async () => {
+      try {
+        const response = await fetch(request);
+        /* Only keep what arrived intact — an errored response stored here
+           would outlive the outage that caused it. */
+        if (response.ok && response.type === "basic") {
+          const cache = await caches.open(CACHE);
+          /* Every route is the same page (the path after # never reaches
+             the server), so navigations share one entry. */
+          const key = request.mode === "navigate" ? BASE : request;
+          cache.put(key, response.clone());
+        }
+        return response;
+      } catch (error) {
+        const cached = await caches.match(
+          request.mode === "navigate" ? BASE : request,
+          { ignoreSearch: request.mode === "navigate" },
+        );
+        if (cached) return cached;
+        throw error;
+      }
+    })(),
   );
 });

@@ -1,58 +1,78 @@
 # Waylay
 
-A private AI chat that runs entirely in the browser. The model runs on the visitor's own device through WebGPU, so there is no server and nothing typed ever leaves the device.
+A private AI chat that runs entirely in your browser. The model downloads once
+to your device and runs there on the GPU (WebGPU); your chats, memories and
+settings live in the browser's own storage. There is no account, no server and
+no API key, and nothing you write ever leaves the device. Once loaded, it works
+offline.
 
-This is the first step: the screens shown when a browser or device can't run a model. Chat isn't built yet, so every visitor currently lands on one of these screens (see `src/config/features.ts`).
+## What it does
 
-## Getting started
+- **On-device chat.** Three models, picked from the composer:
+  - **Fast**: Llama 3.2 1B (about 660 MB). Auto uses this one.
+  - **Thinking**: Qwen 3 1.7B (about 920 MB). Reasons before it answers when
+    thinking is on.
+  - **Heavy**: Llama 3.2 3B (about 1.7 GB).
+- **Streaming replies** with stop, retry, edit, branch and roll back, plus a
+  queue for messages typed while a reply is still being written.
+- **Tools** the model can call: a calculator for exact arithmetic, and memory.
+- **Memory.** The model remembers facts you share across chats. You can see,
+  edit and delete every memory in Settings → Memory.
+- **Voice input**, transcribed on the device with Whisper.
+- **Chat history**: search, pin, rename, folders and incognito chats.
+- **Text and code attachments**, read in the browser.
+- **Installable** as an app (PWA) that keeps working offline.
+- **Storage settings** that show what's downloaded, delete models and erase
+  everything.
 
-```sh
+If the browser or device can't run the models (no WebGPU, or too little
+memory), the app says so and lets you copy the link to open elsewhere.
+
+## Requirements
+
+A browser with WebGPU: a recent Chrome or Edge on desktop, Safari 26+ on
+macOS or iOS, or Chrome on a recent Android phone. Plan for 4 GB of memory or
+more, and room for the model download.
+
+## Development
+
+```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
+npm run build      # static export to out/
+npm run typecheck
+npm run lint
+npm run icons      # re-render the app icons from public/brand/mark.svg
 ```
 
-Then open http://localhost:3000.
+The build is a static site. Set `NEXT_PUBLIC_BASE_PATH` to serve it from a
+subfolder (for example `/waylay` on a GitHub Pages project site). The
+workflow in `.github/workflows/deploy.yml` builds and publishes it to GitHub
+Pages.
 
-### Previewing each screen
+## How it fits together
 
-The app checks the device on load and shows the matching screen. To see a specific one, add `?preview=` to the URL:
+- `app/`, `components/`: the interface.
+- `lib/local/`: everything that replaces a backend.
+  - `db.ts`, `idb.ts`: an in-memory database persisted to IndexedDB.
+  - `functions.ts`, `react.ts`, `api.ts`, `backend/`: queries and mutations
+    with reactive hooks (`useQuery`, `useMutation`).
+  - `inference/`: the model engine (WebLLM in a Web Worker), the system
+    prompt, tool calling, chat titles, and the turn runner that streams
+    replies.
+  - `speech/`: Whisper speech-to-text in a Web Worker
+    (Transformers.js).
+  - `device/`: the WebGPU and memory checks behind the "can't run" notice.
+- `lib/view.tsx`: hash routes (`#/thread/<id>`, `#/settings`, `#/history`),
+  so deep links work on any static host.
 
-- `?preview=browser` shows "This browser can't run Waylay."
-- `?preview=device` shows "This device can't run Waylay."
+## Credits
 
-## Scripts
+Waylay's interface is built on [Whirl](https://github.com/whirlchat/whirl) by
+Anterra, used under the MIT License (see [`LICENSE-WHIRL`](LICENSE-WHIRL)).
+Waylay replaces Whirl's hosted backend with one that runs in the browser.
 
-| Command | What it does |
-| --- | --- |
-| `npm run dev` | Starts the dev server |
-| `npm run build` | Builds a static site into `out/` |
-| `npm run start` | Serves the built site from `out/` |
-| `npm run lint` | Runs ESLint |
-| `npm run typecheck` | Runs the TypeScript compiler |
-| `npm run icons` | Regenerates the favicon and app icons from `src/assets/brand` |
-
-## Project structure
-
-```
-src/
-  app/            Next.js routes, metadata, manifest and generated icons
-  assets/brand/   Source SVGs for the app icon
-  components/
-    brand/        App icon, logo and the backdrop mark
-    icons/        Custom SVG glyphs
-    layout/       App shell and header
-    pwa/          Service worker registration
-    support/      Device check and the "can't run here" screens
-    ui/           Buttons
-  config/         Site text, feature flags, device requirements and supported browsers
-  hooks/          Device check and clipboard hooks
-  lib/            Device detection and formatting helpers
-  styles/         Global styles, design tokens and fonts
-public/
-  icons/          PWA icons
-  sw.js           Service worker for offline use
-```
-
-## Deploying
-
-`npm run build` produces a fully static site in `out/`. It can be hosted on any static host, such as GitHub Pages, Cloudflare Pages or Netlify.
+Models run with [WebLLM](https://github.com/mlc-ai/web-llm) and
+[Transformers.js](https://github.com/huggingface/transformers.js). The
+interface uses the [Inter](https://rsms.me/inter) typeface and
+[Tabler Icons](https://tabler.io/icons).
