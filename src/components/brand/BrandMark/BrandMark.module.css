@@ -1,8 +1,8 @@
 .mark {
   position: absolute;
-  right: -6vw;
-  bottom: -4vw;
-  width: min(62vw, 860px);
+  right: -6dvw;
+  bottom: -4dvw;
+  width: min(62dvw, 860px);
   height: auto;
   pointer-events: none;
 }
@@ -24,9 +24,9 @@
 
 @media (max-width: 720px) {
   .mark {
-    right: -34vw;
-    bottom: -10vw;
-    width: 128vw;
+    right: -34dvw;
+    bottom: -10dvw;
+    width: 128dvw;
   }
 }
 

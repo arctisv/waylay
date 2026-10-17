@@ -40,7 +40,7 @@ html {
 }
 
 body {
-  min-height: 100dvh;
+  min-height: 100dvb;
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-body);

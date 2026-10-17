@@ -41,7 +41,7 @@
 
 .title {
   max-width: 11ch;
-  font-size: clamp(2.875rem, 8.6vw, 6.75rem);
+  font-size: clamp(2.875rem, 8.6dvw, 6.75rem);
   font-weight: 600;
   line-height: 0.98;
   letter-spacing: -0.055em;
@@ -50,7 +50,7 @@
 .description {
   max-width: 40ch;
   color: var(--color-ink-2);
-  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+  font-size: clamp(1.0625rem, 1.5dvw, 1.25rem);
   line-height: 1.5;
 }
 
