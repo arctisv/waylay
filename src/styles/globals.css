@@ -1,0 +1,138 @@
+/* Light only: a white canvas, near-black ink and one periwinkle accent taken from the logo. */
+:root {
+  --color-bg: #ffffff;
+  --color-bg-glass: rgb(255 255 255 / 0.86);
+  --color-bg-fade: rgb(255 255 255 / 0);
+  --color-ink: #0e1014;
+  --color-ink-hover: #272b33;
+  --color-ink-2: #4b505c;
+  --color-ink-3: #8a8f9b;
+  --color-line: #eceef2;
+  --color-line-strong: #dcdfe5;
+  --color-surface: #f6f7f9;
+  --color-surface-2: #eef0f3;
+  --color-accent: #5566f2;
+  --color-accent-soft: #eef0ff;
+  --color-ok: #16a05b;
+  --color-ok-soft: #e7f6ee;
+  --color-bad: #e5484d;
+  --color-bad-soft: #fdeced;
+
+  --font-display: var(--font-manrope), "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: var(--font-instrument), "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --radius-s: 10px;
+  --radius-m: 16px;
+  --radius-l: 24px;
+  --radius-pill: 999px;
+
+  --shadow-float: 0 1px 2px rgb(14 16 20 / 0.04), 0 12px 32px -8px rgb(14 16 20 / 0.12);
+  --shadow-icon: 0 10px 24px -10px rgb(14 16 20 / 0.45);
+
+  --gutter-left: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-right: max(16px, env(safe-area-inset-right, 0px));
+  --content-width: 720px;
+
+  color-scheme: light only;
+  background: var(--color-bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+}
+
+svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+/* No focus outlines or rings anywhere, by design. Components show focus with a fill change instead. */
+*:focus,
+*:focus-visible {
+  outline: none;
+}
+
+::-moz-focus-inner {
+  border: 0;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-ink);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

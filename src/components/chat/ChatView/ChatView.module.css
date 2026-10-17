@@ -1,0 +1,33 @@
+.view {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-left: var(--gutter-left);
+  padding-right: var(--gutter-right);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 40px 32px;
+}
+
+.dock {
+  position: sticky;
+  bottom: 0;
+  padding-top: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to bottom, var(--color-bg-fade), var(--color-bg) 24px);
+}
+
+@media (max-width: 560px) {
+  .body {
+    justify-content: flex-start;
+    padding-block: 24px 24px;
+  }
+}

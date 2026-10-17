@@ -1,0 +1,46 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding-inline: 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.neutral .dot {
+  background: var(--color-ink-3);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.ok .dot {
+  background: var(--color-ok);
+  box-shadow: 0 0 0 3px var(--color-ok-soft);
+}
+
+.bad .dot {
+  background: var(--color-bad);
+  box-shadow: 0 0 0 3px var(--color-bad-soft);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neutral .dot {
+    animation: none;
+  }
+}
