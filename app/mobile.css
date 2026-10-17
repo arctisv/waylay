@@ -27,15 +27,8 @@
 /* The app shell manages its own scrolling in panes; the document behind it
    has nothing to scroll and shouldn't pretend otherwise — that is what turns
    into rubber-banding, into pull-to-refresh firing mid-conversation, and on
-   iOS into the page sliding up under the keyboard.
- *
- * Scoped twice over. To pages that actually mount the shell, because the
- * marketing routes and the public share viewer share this document and are
- * ordinary scrolling pages. And to touch, because `overflow: hidden` on
- * <html> takes the document out of scroll-container territory, which quietly
- * cancels the `scrollbar-gutter: stable` reserved in globals.css — on a
- * desktop with classic scrollbars that is a 15px lurch the moment the shell
- * mounts, in aid of a problem desktop doesn't have. */
+   iOS into the page sliding up under the keyboard. Scoped to pages that mount
+   the shell, and to touch, where the problem lives. */
 @media (hover: none) and (pointer: coarse) {
   html:has(.app-frame),
   body:has(.app-frame) {

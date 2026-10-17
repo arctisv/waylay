@@ -424,7 +424,7 @@ export function ModelSelect({
                     <div
                       ref={scrollRef}
                       onScroll={onScroll}
-                      className="h-56 overflow-y-auto [scrollbar-gutter:stable]"
+                      className="h-56 overflow-y-auto"
                     >
                     <div className="flex min-h-full flex-col">
                     {catalog.length === 0 && (

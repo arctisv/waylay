@@ -513,7 +513,7 @@ export function useComposerCommandMenu({
           >
             <div
               ref={setBodyEl}
-              className="max-h-80 overflow-y-auto p-1 [scrollbar-gutter:stable]"
+              className="max-h-80 overflow-y-auto p-1"
             >
               {commands.length === 0 && !searchPending ? (
                 <div className="px-2 py-4 text-center text-[13px] text-muted-foreground">

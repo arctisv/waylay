@@ -223,7 +223,7 @@ export function ThreadList({ onNavigate }: { onNavigate?: () => void }) {
           <div
             ref={attachScroller}
             onScroll={onScroll}
-            className="h-full overflow-y-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="h-full overflow-y-auto px-3"
           >
             <div className="flex flex-col gap-2">
               {display.folders.length > 0 && (

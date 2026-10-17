@@ -45,7 +45,7 @@ export function SettingsView() {
   const Section = SECTION_VIEWS[section];
 
   return (
-    <div className="flex min-h-0 flex-1 overflow-y-auto px-4 [scrollbar-gutter:stable_both-edges] md:px-6">
+    <div className="flex min-h-0 flex-1 overflow-y-auto px-4 md:px-6">
       {/* h-fit, or the flex stretch pins this box at pane height and the
           pb-16 lands mid-content — clipping the last card's bottom edge. */}
       <div className="mx-auto h-fit w-full max-w-2xl pt-[max(1rem,env(safe-area-inset-top))] pb-10 md:pt-10 md:pb-16">

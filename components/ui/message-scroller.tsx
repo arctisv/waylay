@@ -47,10 +47,7 @@ function MessageScrollerViewport({
     <MessageScrollerPrimitive.Viewport
       data-slot="message-scroller-viewport"
       className={cn(
-        /* both-edges: the gutter reserves symmetrically, so the centered
-           transcript column neither shifts when streaming outgrows the
-           viewport nor sits off-center once the scrollbar lives there. */
-        "size-full min-h-0 min-w-0 overflow-y-auto overscroll-contain [scrollbar-width:thin] [scrollbar-gutter:stable_both-edges]",
+        "size-full min-h-0 min-w-0 overflow-y-auto overscroll-contain",
         className,
       )}
       {...props}

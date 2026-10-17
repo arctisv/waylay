@@ -54,7 +54,7 @@ const POP_IN = {
 /* One result row. Memoized so hover and arrow-key moves only re-render the
    two rows whose highlight changed, and content-visibility lets the browser
    skip layout and paint below the fold (rows are exactly h-9, so the 36px
-   intrinsic size keeps the scrollbar honest). Deep hits carry an excerpt;
+   intrinsic size keeps the scroll height honest). Deep hits carry an excerpt;
    title hits may carry a folder name. */
 const ResultRow = memo(function ResultRow({
   thread,
@@ -387,7 +387,7 @@ export function SearchModal({
         >
           <div
             ref={setBodyEl}
-            className="max-h-80 overflow-y-auto pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="max-h-80 overflow-y-auto pt-1.5"
           >
             {flat.length === 0 && !showDeepNotice ? (
               <div className="flex h-16 items-center justify-center text-sm text-muted-foreground">

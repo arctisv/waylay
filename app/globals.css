@@ -583,10 +583,15 @@ body {
   }
   html {
     @apply font-sans;
-    /* The document scrollbar reserves its lane up front, so a page growing
-       past the fold never nudges the layout sideways. Inner scrollers that
-       toggle at runtime (transcript, pickers, settings panes) carry their
-       own scrollbar-gutter utilities. */
-    scrollbar-gutter: stable;
   }
+}
+
+/* No scrollbars, anywhere: every pane still scrolls by wheel, touch and
+   keys, it just never draws the bar. Unlayered, so no utility brings one
+   back. */
+* {
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
 }

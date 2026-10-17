@@ -32,7 +32,7 @@ export function SectionStrip() {
       glide={false}
       /* Bleeds into the pane's px-4 so the row of chips runs edge to edge
          and reads as scrollable, with the padding restored inside. */
-      className="-mx-4 mb-5 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] md:hidden"
+      className="-mx-4 mb-5 overflow-x-auto px-4 pb-0.5 md:hidden"
     />
   );
 }
