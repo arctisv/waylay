@@ -29,6 +29,7 @@ import {
   THREAD_TITLE_FROM_TRANSCRIPT_PROMPT,
   THREAD_TITLE_PROMPT,
 } from "./prompt";
+import { explicitMemory } from "./explicit-memory";
 import { sanitizeTitle, titlePromptInput } from "./titles";
 import { mightBeToolCall, parseToolCall, runTool, type ToolCall } from "./tools";
 
@@ -174,6 +175,12 @@ async function runTurn(turn: Turn): Promise<void> {
   try {
     const support = await getDeviceSupport();
     if (support.status !== "ready") throw new UnsupportedDeviceError();
+    /* Auto picks for you: a request for a picture goes to the Image model
+       wherever it can run. */
+    if (message.model === "Auto" && support.backend === "webgpu" && asksForPicture(turnPrompt(turn, message))) {
+      db.patch("messages", message._id, { model: "Image" });
+      message.model = "Image";
+    }
     if (message.model === "Image") {
       await runPaintTurn(turn, message, support, startedAt);
       return;
@@ -181,6 +188,16 @@ async function runTurn(turn: Turn): Promise<void> {
     const runtime = runtimeFor(message.model, support);
     const engine = await prepareModel(message, runtime);
     if (turn.cancelled) return;
+
+    /* An outright "remember that…" is kept straight away, so it never
+       depends on a small model choosing to call its tool. */
+    const asked = explicitMemory(turnPrompt(turn, message));
+    const rememberedId = asked ? saveMemory(asked, turn.threadId) : null;
+    if (asked && rememberedId) {
+      addedMemoryIds.push(rememberedId);
+      phases.push({ kind: "memory", label: asked });
+      writePhases(message._id, phases);
+    }
 
     const conversation = buildConversation(turn.threadId, message, runtime);
     let result = await generate({ engine, turn, message, runtime, conversation, phases, tools: true });
@@ -281,11 +298,7 @@ async function runPaintTurn(
   startedAt: number,
 ): Promise<void> {
   if (support.backend !== "webgpu") throw new PaintingNeedsGpuError();
-  const prompt =
-    threadMessages(db, turn.threadId)
-      .filter((row) => row.role === "user" && row.createdAt < message.createdAt)
-      .at(-1)
-      ?.content.trim() ?? "";
+  const prompt = turnPrompt(turn, message);
   if (!prompt) throw new Error("There's nothing to paint.");
 
   /* One big model in memory at a time: the text model steps aside. */
@@ -340,6 +353,25 @@ async function runPaintTurn(
     updatedAt: now,
   });
   db.patch("threads", turn.threadId, { updatedAt: now });
+}
+
+/** The person's message this reply answers. */
+function turnPrompt(turn: Turn, message: MessageRow): string {
+  return (
+    threadMessages(db, turn.threadId)
+      .filter((row) => row.role === "user" && row.createdAt < message.createdAt)
+      .at(-1)
+      ?.content.trim() ?? ""
+  );
+}
+
+/* "Draw a fox", "paint me a lighthouse", "generate an image of…" — asked
+   outright, at the start of the message. */
+const PICTURE_REQUEST =
+  /^(please\s+)?((can|could|would) you\s+)?(draw|paint|sketch|illustrate)\b|^(please\s+)?((can|could|would) you\s+)?(generate|create|make|render)\s+(me\s+)?(an?\s+)?(image|picture|drawing|painting|illustration|photo)\b/i;
+
+function asksForPicture(prompt: string): boolean {
+  return PICTURE_REQUEST.test(prompt.trim());
 }
 
 /** "A fox in the snow, watercolor" → "a-fox-in-the-snow-watercolor". */
