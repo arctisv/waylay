@@ -11,24 +11,27 @@
  * the network can't answer does the stored copy step in. Model downloads
  * come from other origins and are left alone; their own cache holds them.
  *
- * It also makes the page cross-origin isolated by adding the two headers
- * static hosts can't: that unlocks multi-threaded WebAssembly, which the
- * processor model and voice input run several times faster with. It takes
- * effect from the second visit, once the worker controls the page.
+ * It also makes the app cross-origin isolated by adding the headers static
+ * hosts can't, to the page and to everything it loads from here (worker
+ * scripts are refused without them): that unlocks multi-threaded
+ * WebAssembly, which the processor model and voice input run several times
+ * faster with. It takes effect from the second visit, once the worker
+ * controls the page.
  *
  * Bump CACHE to drop every stored copy on the next activation.
  */
 
-const CACHE = "waylay-shell-v2";
+const CACHE = "waylay-shell-v3";
 
 /* The worker's scope is the app's base ("/" or "/waylay/"). */
 const BASE = new URL(self.registration.scope).pathname;
 
-/** The page with the isolation headers added. */
+/** A same-origin response with the isolation headers added. */
 function isolated(response) {
   const headers = new Headers(response.headers);
   headers.set("Cross-Origin-Opener-Policy", "same-origin");
   headers.set("Cross-Origin-Embedder-Policy", "require-corp");
+  headers.set("Cross-Origin-Resource-Policy", "same-origin");
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -91,12 +94,12 @@ self.addEventListener("fetch", (event) => {
           const key = navigation ? BASE : request;
           cache.put(key, response.clone());
         }
-        return navigation ? isolated(response) : response;
+        return isolated(response);
       } catch (error) {
         const cached = await caches.match(navigation ? BASE : request, {
           ignoreSearch: navigation,
         });
-        if (cached) return navigation ? isolated(cached) : cached;
+        if (cached) return isolated(cached);
         throw error;
       }
     })(),

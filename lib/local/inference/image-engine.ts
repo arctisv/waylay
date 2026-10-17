@@ -43,6 +43,17 @@ function getWorker(): Worker {
     if (reply.type === "error") job.reject(new Error(reply.message));
     else job.resolve(reply);
   };
+  /* A worker that can't start (or dies) answers nothing; fail its jobs
+     instead of leaving the turn waiting forever. */
+  worker.onerror = (event) => {
+    event.preventDefault();
+    const error = new Error(event.message || "The picture model stopped working.");
+    for (const job of jobs.values()) job.reject(error);
+    jobs.clear();
+    worker?.terminate();
+    worker = null;
+    loaded = false;
+  };
   return worker;
 }
 

@@ -41,9 +41,16 @@ async function load(id: number, repo: string, dtype: string) {
     file?: string;
     loaded?: number;
     total?: number;
+    progress?: number;
   }) => {
-    if (event.status !== "progress" || !event.file || !event.total) return;
-    files.set(event.file, { loaded: event.loaded ?? 0, total: event.total });
+    if (event.status !== "progress" || !event.file) return;
+    /* Some hosts send no length; a file's own percentage stands in. */
+    files.set(
+      event.file,
+      event.total
+        ? { loaded: event.loaded ?? 0, total: event.total }
+        : { loaded: event.progress ?? 0, total: 100 },
+    );
     let done = 0;
     let total = 0;
     for (const file of files.values()) {

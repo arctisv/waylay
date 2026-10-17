@@ -35,6 +35,16 @@ function getWorker(): Worker {
     if (message.type === "done") job.resolve(message.text);
     else job.reject(new Error(message.message));
   };
+  /* A worker that can't start (or dies) answers nothing; fail its jobs
+     instead of leaving the microphone waiting forever. */
+  worker.onerror = (event) => {
+    event.preventDefault();
+    const error = new Error(event.message || "Voice input stopped working.");
+    for (const job of pending.values()) job.reject(error);
+    pending.clear();
+    worker?.terminate();
+    worker = null;
+  };
   return worker;
 }
 
