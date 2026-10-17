@@ -66,7 +66,7 @@ export function SettingsCard({
   return (
     <section
       className={cn(
-        "divide-y divide-border rounded-lg border border-border",
+        "divide-y divide-border border border-border",
         className,
       )}
     >
@@ -134,7 +134,7 @@ export function SettingsRow({
     <div className="p-4">
       <div className="flex items-center gap-3">
         {(iconNode || RowIcon) && (
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-well text-foreground shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
+          <span className="flex size-9 shrink-0 items-center justify-center bg-well text-foreground shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
             {iconNode ?? (RowIcon && <RowIcon size={18} />)}
           </span>
         )}

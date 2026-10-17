@@ -6,9 +6,11 @@ import { useEffect, useState } from "react";
    data-accent attribute on <html> — app/accents.css maps each name onto
    the --primary family. A blocking inline script in the root layout
    applies it before first paint; this hook is for switching afterwards.
-   Graphite is the stock monochrome ink and simply clears the attribute. */
+   Waylay's own grained gradient is the default and simply clears the
+   attribute. */
 
 export type Accent =
+  | "waylay"
   | "graphite"
   | "cherry"
   | "tangerine"
@@ -19,15 +21,24 @@ export type Accent =
   | "grape"
   | "flamingo";
 
-export const DEFAULT_ACCENT: Accent = "graphite";
+export const DEFAULT_ACCENT: Accent = "waylay";
 
-/* Swatches mirror each accent's light/dark --primary in app/accents.css —
-   keep the two files in step. */
+/* Swatches mirror each accent's light/dark fill in app/accents.css and
+   globals.css — keep the files in step. Any CSS background works, so
+   Waylay's swatch is its gradient. */
 export const ACCENT_OPTIONS: {
   value: Accent;
   label: string;
   swatch: { light: string; dark: string };
 }[] = [
+  {
+    value: "waylay",
+    label: "Waylay",
+    swatch: {
+      light: "linear-gradient(135deg, #09090b 0%, #0c1c52 52%, #2563eb 100%)",
+      dark: "linear-gradient(135deg, #ffffff 0%, #d9e5ff 40%, #4d8bff 100%)",
+    },
+  },
   {
     value: "graphite",
     label: "Graphite",

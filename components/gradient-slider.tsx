@@ -74,7 +74,7 @@ export function GradientSlider({
         onChange(Math.min(1, Math.max(0, value + delta)));
       }}
       style={{ background: trackBackground }}
-      className="relative h-4 w-full cursor-pointer touch-none rounded-full shadow-[inset_0_0_0_1px_var(--well-outline)] outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="relative h-4 w-full cursor-pointer touch-none shadow-[inset_0_0_0_1px_var(--well-outline)] outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <span
         aria-hidden
@@ -82,7 +82,7 @@ export function GradientSlider({
           left: `calc(10px + ${value} * (100% - 20px))`,
           background: thumbColor,
         }}
-        className="absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface shadow-[0_0_0_1px_var(--well-outline)]"
+        className="absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 border-2 border-surface shadow-[0_0_0_1px_var(--well-outline)]"
       />
     </div>
   );

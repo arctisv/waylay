@@ -19,7 +19,7 @@
 
 /** Theme class + accent attribute. Mirrors lib/theme.ts and app/accents.css. */
 export const THEME_BOOT_SCRIPT =
-  "try{var t=localStorage.getItem('theme');if(t==='dark'||((t==='system'||!t)&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');var a=localStorage.getItem('accent');if(a&&a!=='graphite'&&/^[a-z]+$/.test(a))document.documentElement.setAttribute('data-accent',a)}catch(e){}";
+  "try{var t=localStorage.getItem('theme');if(t==='dark'||((t==='system'||!t)&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');var a=localStorage.getItem('accent');if(a&&a!=='waylay'&&/^[a-z]+$/.test(a))document.documentElement.setAttribute('data-accent',a)}catch(e){}";
 
 /** Canvas tint tokens. The math mirrors tintTokens in lib/tint.ts — keep them in step. */
 export const TINT_BOOT_SCRIPT =

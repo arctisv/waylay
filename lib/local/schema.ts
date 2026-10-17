@@ -42,7 +42,6 @@ export type MessageRow = {
   streamId?: string;
   model?: string;
   thinking?: boolean;
-  search?: boolean;
   outputTokens?: number;
   durationMs?: number;
   addedMemoryIds?: string[];
@@ -58,7 +57,6 @@ export type FolderRow = {
 
 export type SendOptions = {
   thinking?: boolean;
-  search?: boolean;
   model?: string;
 };
 

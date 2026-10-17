@@ -16,7 +16,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ComposerModel } from "@/lib/models";
-import { ModelGlyph } from "./model-glyph";
 
 /* The model filter, shared by the composer's picker and the Models
    settings page: a round button opening a context menu — a Provider
@@ -76,26 +75,19 @@ export function ModelFilterMenu({
   capabilities: ReadonlySet<string>;
   onCapabilitiesChange: (capabilities: ReadonlySet<string>) => void;
 }) {
-  /* The maker list, each remembering the first model glyph seen wearing it
-     so the menu can show the maker's mark. */
-  const providerLogos = new Map<string, string | undefined>();
-  for (const model of models) {
-    const name = providerOf(model);
-    if (!name) continue;
-    if (!providerLogos.get(name)) {
-      providerLogos.set(name, model.iconSvg);
-    }
-  }
-  const providers = [...providerLogos.keys()].sort((a, b) =>
-    a.localeCompare(b),
-  );
+  /* The makers, alphabetically. */
+  const providers = [
+    ...new Set(
+      models.map(providerOf).filter((name): name is string => Boolean(name)),
+    ),
+  ].sort((a, b) => a.localeCompare(b));
   const active = provider !== null || capabilities.size > 0;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Filter models"
-        className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors duration-150 ${
+        className={`flex size-8 shrink-0 cursor-pointer items-center justify-center transition-colors duration-150 ${
           active
             ? "bg-primary text-primary-foreground"
             : "text-muted-foreground hover:bg-black/[0.05] hover:text-foreground data-popup-open:bg-black/[0.05] data-popup-open:text-foreground dark:hover:bg-white/[0.06] dark:data-popup-open:bg-white/[0.06]"
@@ -130,11 +122,6 @@ export function ModelFilterMenu({
               </DropdownMenuRadioItem>
               {providers.map((name) => (
                 <DropdownMenuRadioItem key={name} value={name}>
-                  <ModelGlyph
-                    model={{ iconSvg: providerLogos.get(name) }}
-                    size={14}
-                    className="text-muted-foreground"
-                  />
                   <span className="truncate">{name}</span>
                 </DropdownMenuRadioItem>
               ))}

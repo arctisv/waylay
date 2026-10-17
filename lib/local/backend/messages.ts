@@ -25,7 +25,6 @@ function formatMessage(message: MessageRow) {
     streamId: message.streamId,
     model: message.model,
     thinking: message.thinking,
-    search: message.search,
     addedMemoryIds: message.addedMemoryIds,
     outputTokens: message.outputTokens,
     durationMs: message.durationMs,
@@ -145,7 +144,6 @@ export const prepareAssistantRetryFromUser = mutation(
       phases: [],
       model: ctx.db.get("threads", threadId)?.model ?? "Auto",
       thinking: false,
-      search: false,
     });
     return restartAssistantTurn(threadId, ctx.db.get("messages", assistantId)!);
   },

@@ -18,7 +18,7 @@ import { ConfirmDialog } from "./confirm-dialog";
    primary ink so the mode reads at a glance. */
 
 const BUTTON_BASE =
-  "flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors duration-150";
+  "flex size-8 cursor-pointer items-center justify-center transition-colors duration-150";
 
 const IDLE_CLASS = `${BUTTON_BASE} bg-(--well-translucent) text-muted-foreground shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)] backdrop-blur-xl hover:text-foreground`;
 

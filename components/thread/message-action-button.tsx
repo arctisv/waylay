@@ -10,7 +10,7 @@ import {
    one shared look, tooltip included. */
 
 export const MESSAGE_ACTION_CLASS =
-  "flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]";
+  "flex size-7 cursor-pointer items-center justify-center text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]";
 
 export function MessageActionButton({
   label,

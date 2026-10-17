@@ -1,9 +1,9 @@
-/* Accent themes: opt-in splashes of color, picked in Settings →
-   Personalization. The chosen accent rides <html data-accent="…"> (set
-   pre-paint by the root layout script, switched by lib/accent.ts) and
-   re-inks the --primary family plus the focus ring — anything painted
-   with bg-primary / text-primary-foreground follows along. No attribute
-   means graphite, the stock monochrome ink from globals.css.
+/* Accent themes, picked in Settings → Personalization. The chosen accent
+   rides <html data-accent="…"> (set pre-paint by the root layout script,
+   switched by lib/accent.ts) and re-inks the --primary family plus the
+   focus ring — anything painted with bg-primary / text-primary-foreground
+   follows along. No attribute means Waylay's own accent: the grained
+   gradient below, over the blue --primary from globals.css.
 
    Values are spelled out literally on purpose: the compiler's
    browser-target downgrade mangles color functions built from vars (see
@@ -11,6 +11,40 @@
    lib/accent.ts mirror each accent's light/dark --primary — keep the two
    files in step. Selectors are html-scoped so they outrank :root and
    .dark regardless of import order. */
+
+/* Waylay's accent: a gradient (black to blue in light mode, white to blue
+   in dark — the stops live in globals.css) under a film of grain, blended
+   soft-light so the noise reads on both its dark and bright ends. It
+   replaces the flat fill on every bg-primary surface and on .accent-fill
+   (the logo). Unlayered, so it outranks the layered utilities. */
+:root {
+  --accent-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.55'/%3E%3C/svg%3E");
+}
+.accent-fill {
+  background-color: var(--primary);
+}
+html:not([data-accent]) :is(.bg-primary, .accent-fill) {
+  background-image: var(--accent-grain), var(--accent-gradient);
+  background-size: 160px 160px, 100% 100%;
+  background-blend-mode: soft-light, normal;
+}
+html:not([data-accent]) :is(button, a).bg-primary:hover {
+  filter: brightness(1.1) saturate(1.15);
+}
+
+/* Graphite: the monochrome ink, for anyone who'd rather have no color. */
+html[data-accent="graphite"] {
+  --primary: oklch(0.17 0 0);
+  --primary-hover: oklch(0.28 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.6 0 0);
+}
+html.dark[data-accent="graphite"] {
+  --primary: oklch(0.9 0 0);
+  --primary-hover: oklch(0.95 0 0);
+  --primary-foreground: oklch(0.17 0 0);
+  --ring: oklch(0.6 0 0);
+}
 
 html[data-accent="cherry"] {
   --primary: oklch(0.55 0.19 25);

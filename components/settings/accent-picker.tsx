@@ -6,9 +6,9 @@ import { ACCENT_OPTIONS, type Accent } from "@/lib/accent";
 import { cn } from "@/lib/utils";
 
 /* A row of paint dabs, one per accent, each tinted for whichever mode is
-   active via a pair of inline swatch vars. The picked one earns an orbit
-   ring in its own color; the rest keep a hairline inset so the pale ones
-   don't dissolve into the card. */
+   active via a pair of inline swatch vars (a color or a gradient). The
+   picked one earns a ring; the rest keep a hairline inset so the pale
+   ones don't dissolve into the card. */
 export function AccentPicker({
   value,
   onChange,
@@ -42,9 +42,9 @@ export function AccentPicker({
               } as CSSProperties
             }
             className={cn(
-              "size-8 cursor-pointer rounded-full bg-(--swatch-light) transition-[scale,box-shadow] duration-150 hover:scale-110 active:scale-95 dark:bg-(--swatch-dark)",
+              "size-8 cursor-pointer [background:var(--swatch-light)] transition-[scale,box-shadow] duration-150 hover:scale-110 active:scale-95 dark:[background:var(--swatch-dark)]",
               selected
-                ? "ring-2 ring-(--swatch-light) ring-offset-2 ring-offset-surface dark:ring-(--swatch-dark)"
+                ? "ring-2 ring-foreground ring-offset-2 ring-offset-surface"
                 : "shadow-[inset_0_0_0_1px_rgb(0_0_0_/_0.08)] dark:shadow-[inset_0_0_0_1px_rgb(255_255_255_/_0.1)]",
             )}
           />

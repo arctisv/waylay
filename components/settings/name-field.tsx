@@ -47,7 +47,7 @@ export function NameField() {
         autoComplete="given-name"
         placeholder="e.g. Sam"
         aria-label="Your name"
-        className="h-9 w-full rounded-lg bg-well px-3 text-[13px]/5 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)] outline-none transition-shadow placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+        className="h-9 w-full bg-well px-3 text-[13px]/5 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)] outline-none transition-shadow placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
       />
     </SettingsRow>
   );

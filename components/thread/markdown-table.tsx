@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 /* Tables for assistant prose, replacing Streamdown's default (double
    frame, padded gutter, controls rows). One clean box in the house
-   style: a single hairline rounded-xl container, a quietly tinted
+   style: a single hairline container, a quietly tinted
    header band of muted normal-case labels, rows on the plain surface
    divided by the same hairline — flat, no shadows, no footer bar.
    Wide tables scroll sideways inside the box; columns never squeeze
@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 export const TABLE_COMPONENTS: NonNullable<StreamdownProps["components"]> = {
   table: ({ node: _node, className, children, ...props }) => (
-    <div className="my-4 w-full overflow-hidden rounded-xl border border-border">
+    <div className="my-4 w-full overflow-hidden border border-border">
       <div className="w-full overflow-x-auto [scrollbar-width:thin]">
         <table
           className={cn("w-full border-collapse text-[14px]/6", className)}

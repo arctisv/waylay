@@ -29,7 +29,7 @@ import { CHAT_MODELS, type ThinkingLevel } from "./models";
    whole way. */
 
 export type MessageStatus =
-  "thinking" | "searching" | "streaming" | "complete" | "stopped" | "error";
+  "thinking" | "streaming" | "complete" | "stopped" | "error";
 
 export type MessageAttachment = {
   id: string;
@@ -90,7 +90,6 @@ export type ChatMessage = {
   streamId?: string;
   model?: string;
   thinking?: boolean;
-  search?: boolean;
   attachments?: MessageAttachment[];
   /* Reply bookkeeping for the "Show stats" chips — completion tokens
      (reasoning included) and wall-clock generation time. Absent on user
@@ -315,7 +314,6 @@ export type SendMessageArgs = {
      removed quietly runs Auto. */
   model: string;
   attachments: AttachmentUpload[];
-  search: boolean;
   thinking: ThinkingLevel;
   /* Ephemeral thread: flagged so listings, memory, search, and title
      generation all skip it, and it purges on exit. */
@@ -325,6 +323,12 @@ export type SendMessageArgs = {
 /* Anything that isn't a model in the lineup folds to Auto. */
 function wireModel(model: string): string {
   return CHAT_MODELS.find((entry) => entry.key === model)?.key ?? "Auto";
+}
+
+/* Only a model that can think gets a thinking turn. */
+function wireThinking(model: string, thinking: ThinkingLevel): boolean {
+  const entry = CHAT_MODELS.find((candidate) => candidate.key === wireModel(model));
+  return thinking !== "none" && Boolean(entry?.thinkingLevels.includes(thinking));
 }
 
 export function useMessageActions() {
@@ -422,7 +426,6 @@ export function useMessageActions() {
       text,
       model,
       attachments,
-      search,
       thinking,
       incognito,
     }: SendMessageArgs): Promise<string> => {
@@ -445,8 +448,7 @@ export function useMessageActions() {
             }
           : {}),
         options: {
-          thinking: thinking !== "none",
-          search,
+          thinking: wireThinking(model, thinking),
           model: wireModel(model),
         },
       });
@@ -471,11 +473,10 @@ export function useMessageActions() {
           role: "assistant",
           content: "",
           createdAt: now + 1,
-          status: thinking !== "none" ? "thinking" : "streaming",
+          status: wireThinking(model, thinking) ? "thinking" : "streaming",
           streamId: result.streamId,
           model: wireModel(model),
-          thinking: thinking !== "none",
-          search,
+          thinking: wireThinking(model, thinking),
         },
       });
       return result.threadId;

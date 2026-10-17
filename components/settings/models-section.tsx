@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { IconArchive, IconChevronDown } from "@tabler/icons-react";
 
 import { filterModels, ModelFilterMenu } from "@/components/model-filter-menu";
 import { ModelGlyph } from "@/components/model-glyph";
@@ -39,20 +38,9 @@ export function ModelsSection() {
   const [capabilities, setCapabilities] = useState<ReadonlySet<string>>(
     new Set(),
   );
-  const [legacyOpen, setLegacyOpen] = useState(false);
-
-  const visibleModels = models;
-
-  /* Legacy models fold behind a count row here too — same shelf as the
-     picker; a typed search finds them directly. */
   const needle = query.trim();
-  const filtered = filterModels(visibleModels, provider, capabilities);
-  const shownModels = needle
-    ? searchModels(filtered, needle)
-    : filtered.filter((model) => !model.legacy);
-  const legacyModels = needle
-    ? []
-    : filtered.filter((model) => model.legacy);
+  const filtered = filterModels(models, provider, capabilities);
+  const shownModels = needle ? searchModels(filtered, needle) : filtered;
 
   const modelRow = (model: ComposerModel) => (
     <SettingsRow
@@ -83,7 +71,7 @@ export function ModelsSection() {
           placeholder="Search models…"
           trailing={
             <ModelFilterMenu
-              models={visibleModels}
+              models={models}
               provider={provider}
               onProviderChange={setProvider}
               capabilities={capabilities}
@@ -92,26 +80,7 @@ export function ModelsSection() {
           }
         />
         {shownModels.map(modelRow)}
-        {legacyModels.length > 0 && (
-          <button
-            type="button"
-            aria-expanded={legacyOpen}
-            onClick={() => setLegacyOpen((prev) => !prev)}
-            className="flex h-11 w-full cursor-pointer items-center gap-2.5 px-4 text-sm text-muted-foreground transition-colors duration-100 hover:text-foreground"
-          >
-            <IconArchive size={16} className="shrink-0" />
-            {legacyModels.length} legacy{" "}
-            {legacyModels.length === 1 ? "model" : "models"}
-            <IconChevronDown
-              size={15}
-              className={`ml-auto shrink-0 transition-[rotate] duration-150 ${
-                legacyOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-        )}
-        {legacyOpen && legacyModels.map(modelRow)}
-        {shownModels.length === 0 && legacyModels.length === 0 && (
+        {shownModels.length === 0 && (
           <p className="p-4 text-sm text-muted-foreground">
             {needle
               ? `No models match “${query.trim()}”.`

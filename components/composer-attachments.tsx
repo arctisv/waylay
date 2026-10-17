@@ -118,7 +118,7 @@ function DraftChip({
         <img
           src={draft.previewUrl}
           alt={draft.name}
-          className={`h-14 w-auto min-w-14 max-w-40 rounded-[14px] object-cover ring-1 transition-opacity duration-200 ${
+          className={`h-14 w-auto min-w-14 max-w-40 object-cover ring-1 transition-opacity duration-200 ${
             error
               ? "ring-red-500/60"
               : "ring-black/[0.06] dark:ring-white/[0.08]"
@@ -132,10 +132,10 @@ function DraftChip({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={BAR_EXIT}
-              className="absolute inset-x-2 bottom-2 h-1 overflow-hidden rounded-full bg-black/30"
+              className="absolute inset-x-2 bottom-2 h-1 overflow-hidden bg-black/30"
             >
               <motion.div
-                className="h-full rounded-full bg-white"
+                className="h-full bg-white"
                 initial={false}
                 animate={{
                   width: `${Math.max(6, Math.round(draft.progress * 100))}%`,
@@ -148,7 +148,7 @@ function DraftChip({
         {error && (
           <div
             aria-hidden
-            className="absolute inset-x-2 bottom-2 h-1 rounded-full bg-red-500/70"
+            className="absolute inset-x-2 bottom-2 h-1 bg-red-500/70"
           />
         )}
         <RemoveButton name={draft.name} onRemove={onRemove} />
@@ -161,7 +161,7 @@ function DraftChip({
       {/* Clipped underlay: the chip surface plus the progress fill that
           sweeps across it. The remove button overhangs the corner, so the
           clipping can't live on the chip itself. */}
-      <div className="absolute inset-0 overflow-hidden rounded-2xl bg-black/[0.05] dark:bg-white/[0.06]">
+      <div className="absolute inset-0 overflow-hidden bg-black/[0.05] dark:bg-white/[0.06]">
         {error ? (
           <div className="absolute inset-0 bg-red-500/[0.06] dark:bg-red-500/[0.09]" />
         ) : (
@@ -228,7 +228,7 @@ function RemoveButton({
         event.stopPropagation();
         onRemove();
       }}
-      className="absolute -top-1.5 -right-1.5 flex size-5 cursor-pointer items-center justify-center rounded-full bg-foreground text-background opacity-0 transition-opacity duration-150 group-hover/att:opacity-100 focus-visible:opacity-100"
+      className="absolute -top-1.5 -right-1.5 flex size-5 cursor-pointer items-center justify-center bg-foreground text-background opacity-0 transition-opacity duration-150 group-hover/att:opacity-100 focus-visible:opacity-100"
     >
       <IconX size={11} stroke={2.5} />
     </button>

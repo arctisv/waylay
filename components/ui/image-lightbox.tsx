@@ -30,18 +30,18 @@ export function ImageLightbox({
       <DialogContent
         aria-label={alt}
         backdropClassName="bg-black/70 backdrop-blur-sm"
-        className="top-1/2 w-auto max-w-[calc(100vw-3rem)] -translate-y-1/2 rounded-2xl bg-transparent p-0 ring-0"
+        className="top-1/2 w-auto max-w-[calc(100vw-3rem)] -translate-y-1/2 bg-transparent p-0 ring-0"
       >
         <DialogTitle className="sr-only">{alt}</DialogTitle>
         {/* eslint-disable-next-line @next/next/no-img-element -- local object URL */}
         <img
           src={src}
           alt={alt}
-          className="max-h-[85vh] w-auto max-w-full rounded-2xl object-contain"
+          className="max-h-[85vh] w-auto max-w-full object-contain"
         />
         <DialogClose
           aria-label="Close image"
-          className="absolute top-3 right-3 flex size-9 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-colors duration-150 hover:bg-black/60"
+          className="absolute top-3 right-3 flex size-9 cursor-pointer items-center justify-center bg-black/40 text-white backdrop-blur-md transition-colors duration-150 hover:bg-black/60"
         >
           <IconX size={17} stroke={2.2} />
         </DialogClose>

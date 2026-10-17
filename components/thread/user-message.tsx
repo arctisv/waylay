@@ -52,7 +52,7 @@ export function UserMessage({
           {message.content.length > 0 && (
             <div
               data-quotable="user"
-              className="min-w-0 max-w-[85%] rounded-[20px] rounded-br-md bg-well px-3.5 py-2 text-[15px]/6 break-words whitespace-pre-wrap [overflow-wrap:anywhere] shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]"
+              className="min-w-0 max-w-[85%] bg-well px-3.5 py-2 text-[15px]/6 break-words whitespace-pre-wrap [overflow-wrap:anywhere] shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]"
             >
               {message.content}
             </div>
@@ -101,7 +101,7 @@ function EditCard({
   const canSave = trimmed.length > 0 && trimmed !== initial.trim();
 
   return (
-    <div className="w-fit min-w-0 max-w-[85%] rounded-[20px] rounded-br-md bg-well p-2 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
+    <div className="w-fit min-w-0 max-w-[85%] bg-well p-2 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
       {/* The classic mirror-in-a-grid: an invisible copy of the draft sets
           both width and height, the textarea just fills the cell — so the
           capsule hugs the words like the bubble it replaced. */}
@@ -135,7 +135,7 @@ function EditCard({
           type="button"
           aria-label="Cancel edit"
           onClick={onCancel}
-          className="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]"
+          className="flex size-8 cursor-pointer items-center justify-center text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]"
         >
           <IconX size={16} />
         </button>
@@ -143,7 +143,7 @@ function EditCard({
           aria-label="Save and resend"
           disabled={!canSave}
           onClick={() => onSave(trimmed)}
-          className="size-8 shrink-0 justify-center rounded-full p-0 transition-[background-color,scale,opacity] disabled:pointer-events-none disabled:opacity-40"
+          className="size-8 shrink-0 justify-center p-0 transition-[background-color,scale,opacity] disabled:pointer-events-none disabled:opacity-40"
         >
           <IconArrowUp size={16} stroke={2.5} />
         </SquishButton>

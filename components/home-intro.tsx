@@ -47,7 +47,7 @@ function bootRing(url: string) {
     "-webkit-mask-size:contain;mask-size:contain";
   return (
     `<span style="position:absolute;inset:0;${mask}">` +
-    '<span class="bg-foreground-soft" style="position:absolute;inset:0"></span>' +
+    '<span class="accent-fill" style="position:absolute;inset:0"></span>' +
     "</span>"
   );
 }

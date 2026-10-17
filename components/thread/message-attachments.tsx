@@ -28,7 +28,7 @@ function ImageThumb({ attachment }: { attachment: MessageAttachment }) {
         <img
           src={attachment.url}
           alt={attachment.name}
-          className="h-24 w-auto min-w-16 max-w-56 rounded-[14px] object-cover ring-1 ring-black/[0.06] dark:ring-white/[0.08]"
+          className="h-24 w-auto min-w-16 max-w-56 object-cover ring-1 ring-black/[0.06] dark:ring-white/[0.08]"
         />
       </button>
       <ImageLightbox
@@ -55,7 +55,7 @@ export function MessageAttachments({
         ) : (
           <div
             key={attachment.id}
-            className="flex w-52 items-center gap-2.5 rounded-2xl bg-black/[0.05] px-3 py-2 dark:bg-white/[0.06]"
+            className="flex w-52 items-center gap-2.5 bg-black/[0.05] px-3 py-2 dark:bg-white/[0.06]"
           >
             {fileGlyph(
               attachment.name,

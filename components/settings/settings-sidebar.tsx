@@ -10,7 +10,6 @@ import {
 } from "@tabler/icons-react";
 
 import { IconBrainFilled } from "@/components/icons/brain-filled";
-import { useSettingsSections } from "@/lib/deployment-features";
 import { useView, type SettingsSection } from "@/lib/view";
 import { SidebarRow } from "../sidebar-row";
 
@@ -33,8 +32,7 @@ export function SettingsSidebar({
   onNavigate?: () => void;
 }) {
   const { section, setSection, closeSettings } = useView();
-  const visible = useSettingsSections();
-  const sections = SECTIONS.filter(({ key }) => visible.includes(key));
+  const sections = SECTIONS;
 
   return (
     <>

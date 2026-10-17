@@ -100,19 +100,19 @@ export function useTwirl() {
    180 / 182 horizontal inset. */
 const ANIMATED_MARK_WIDTH_PCT = (240 / 182) * 100;
 const ANIMATED_MARK_HEIGHT_PCT = (242 / 182) * 100;
+const ANIMATED_MASK: CSSProperties = maskStyle(publicPath("/brand/mark-animate.svg"));
 
-/** The animated mark, shared by every interactive logo. */
+/** The animated mark, shared by every interactive logo. It paints through
+ *  the animated SVG as a mask, so it wears the same fill as the resting
+ *  mark underneath (the accent, wherever the logo does). */
 export function AnimatedMark({
   className = "",
 }: {
   className?: string;
 }) {
   return (
-    <motion.img
-      src={publicPath("/brand/mark-animate.svg")}
-      alt=""
+    <motion.span
       aria-hidden
-      draggable={false}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -121,10 +121,11 @@ export function AnimatedMark({
         ease: [0.22, 1, 0.36, 1],
       }}
       style={{
+        ...ANIMATED_MASK,
         width: `${ANIMATED_MARK_WIDTH_PCT}%`,
         height: `${ANIMATED_MARK_HEIGHT_PCT}%`,
       }}
-      className={`pointer-events-none absolute top-1/2 left-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 dark:invert ${className}`}
+      className={`pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${className}`}
     />
   );
 }
@@ -146,7 +147,9 @@ export function HoverMark({
         }`}
       />
       <AnimatePresence>
-        {twirling && <AnimatedMark key="animated-mark" />}
+        {twirling && (
+          <AnimatedMark key="animated-mark" className={layers[0]?.className} />
+        )}
       </AnimatePresence>
     </>
   );

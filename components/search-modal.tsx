@@ -82,7 +82,7 @@ const ResultRow = memo(function ResultRow({
       data-index={index}
       onClick={() => onSelect(thread)}
       onMouseEnter={() => onHover(index)}
-      className={`flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13.5px]/4 [contain-intrinsic-size:auto_36px] [content-visibility:auto] ${
+      className={`flex h-9 w-full cursor-pointer items-center gap-2.5 px-2.5 text-[13.5px]/4 [contain-intrinsic-size:auto_36px] [content-visibility:auto] ${
         active ? "bg-accent text-accent-foreground" : ""
       }`}
     >
@@ -371,7 +371,7 @@ export function SearchModal({
             placeholder="Search threads…"
             className="h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
-          <kbd className="shrink-0 rounded-md px-1.5 py-0.5 text-xs text-muted-foreground ring-1 ring-border">
+          <kbd className="shrink-0 px-1.5 py-0.5 text-xs text-muted-foreground ring-1 ring-border">
             Esc
           </kbd>
         </div>

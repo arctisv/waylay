@@ -42,7 +42,7 @@ export function LinkSafetyDialog({
       <DialogContent backdropClassName="backdrop-blur-xs">
         <DialogClose
           aria-label="Close"
-          className="absolute top-3 right-3 flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]"
+          className="absolute top-3 right-3 flex size-7 cursor-pointer items-center justify-center text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]"
         >
           <IconX size={15} />
         </DialogClose>
@@ -52,7 +52,7 @@ export function LinkSafetyDialog({
             This link leads outside Waylay — check the address before you go.
           </DialogDescription>
         </DialogHeader>
-        <div className="mt-3 max-h-28 overflow-y-auto rounded-lg bg-well px-3 py-2 font-mono text-xs/5 break-all text-muted-foreground shadow-[inset_0_0_0_1px_var(--well-outline)]">
+        <div className="mt-3 max-h-28 overflow-y-auto bg-well px-3 py-2 font-mono text-xs/5 break-all text-muted-foreground shadow-[inset_0_0_0_1px_var(--well-outline)]">
           {url}
         </div>
         <DialogFooter>

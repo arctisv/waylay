@@ -7,11 +7,9 @@ import {
   useState,
 } from "react";
 import {
-  IconArchive,
   IconArrowLeft,
   IconBrain,
   IconCheck,
-  IconChevronDown,
   IconChevronRight,
   IconEyeFilled,
   IconFileFilled,
@@ -35,7 +33,6 @@ import type { SetModelPref } from "@/lib/model-pref";
 import { searchModels } from "@/lib/model-search";
 import {
   THINKING_LABELS,
-  isCustomModelKey,
   type ComposerModel,
   type ThinkingLevel,
 } from "@/lib/models";
@@ -44,7 +41,6 @@ import { filterModels, ModelFilterMenu } from "./model-filter-menu";
 import { ModelGlyph } from "./model-glyph";
 import { ScrollFade, useScrollFades } from "./scroll-fade";
 import { SteppedSlider } from "./stepped-slider";
-import { ToggleSwitch } from "./toggle-switch";
 
 const SMALL_WIDTH = 232;
 const BIG_WIDTH = 320;
@@ -80,7 +76,7 @@ const ROLL = {
   transformTemplate: pinRasterPath,
 } as const;
 
-/* Gate icons (search / thinking) grow into the chip and collapse away,
+/* The gate icon (thinking) grows into the chip and collapse away,
    margin included, so the neighbors glide instead of jumping the gap. */
 const GATE = {
   initial: { width: 0, marginLeft: 0, opacity: 0, scale: 0.5 },
@@ -96,7 +92,7 @@ const GATE = {
 } as const;
 
 const ROW =
-  "flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-left text-[13.5px]/5 transition-colors duration-100 hover:bg-accent hover:text-accent-foreground";
+  "flex w-full cursor-pointer items-center gap-2 px-2 py-1 text-left text-[13.5px]/5 transition-colors duration-100 hover:bg-accent hover:text-accent-foreground";
 
 function CapabilityIcon({
   label,
@@ -125,7 +121,7 @@ function ModelTags({ model }: { model: ComposerModel }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {hasMarks && (
-        <span className="flex h-5 items-center gap-1.5 rounded-full bg-black/[0.05] px-2 text-muted-foreground dark:bg-white/[0.06]">
+        <span className="flex h-5 items-center gap-1.5 bg-black/[0.05] px-2 text-muted-foreground dark:bg-white/[0.06]">
           {model.vision && (
             <CapabilityIcon label="Sees images">
               <IconEyeFilled size={12} />
@@ -153,35 +149,26 @@ function ModelTags({ model }: { model: ComposerModel }) {
 }
 
 /* The composer's model chip. Opens the compact picker — favorited models
-   plus the search/thinking gates — which morphs into the full catalog
-   (search, capability tags, favorite stars) and back, one surface
-   stretching between the two. The chip itself morphs too: the model rolls
-   over on change and little gate icons grow in while search/thinking are
-   engaged. */
+   plus the thinking gate — which morphs into the full catalog (search,
+   capability tags, favorite stars) and back, one surface stretching
+   between the two. The chip itself morphs too: the model rolls over on
+   change and a little brain grows in while thinking is engaged. */
 export function ModelSelect({
   value,
   onValueChange,
-  searchAvailable = true,
-  searchOn,
-  onSearchOnChange,
   thinking,
   onThinkingChange,
 }: {
   value: string;
   onValueChange: SetModelPref;
-  /** False when this deployment has no web search: the switch hides. */
-  searchAvailable?: boolean;
-  /* The gates live in the composer (one source of truth — the command
-     palette flips them too); this picker just wears and edits them. */
-  searchOn: boolean;
-  onSearchOnChange: (on: boolean) => void;
+  /* The gate lives in the composer (one source of truth — the command
+     palette flips it too); this picker just wears and edits it. */
   thinking: ThinkingLevel;
   onThinkingChange: (level: ThinkingLevel) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"small" | "big">("small");
   const [query, setQuery] = useState("");
-  const [legacyOpen, setLegacyOpen] = useState(false);
   const [providerFilter, setProviderFilter] = useState<string | null>(null);
   const [capabilityFilters, setCapabilityFilters] = useState<
     ReadonlySet<string>
@@ -201,11 +188,10 @@ export function ModelSelect({
      wouldn't carry. */
   const levels = current.thinkingLevels;
   const level = clampThinking(current, thinking);
-  /* Auto runs the gates itself — both rows blank out and the chip shows no
-     gate icons. The user's choices survive underneath for when they switch
+  /* Auto runs the gate itself — the row blanks out and the chip shows no
+     gate icon. The user's choice survives underneath for when they switch
      back to a hands-on model. */
   const gatesLocked = current.autoGates;
-  const searchShown = searchOn && !gatesLocked;
   const thinkingOn = level !== "none" && !gatesLocked;
   const thinkingLabel = gatesLocked
     ? current.key === "Auto"
@@ -220,7 +206,7 @@ export function ModelSelect({
   const [chipWidth, setChipWidth] = useState<number | "auto">("auto");
   useLayoutEffect(() => {
     if (twinRef.current) setChipWidth(twinRef.current.offsetWidth);
-  }, [value, current.name, searchShown, thinkingOn]);
+  }, [value, current.name, thinkingOn]);
 
   /* The popover's height morph: measure whichever view is live (popLayout
      pops the exiting one out of flow) and let the spring chase it. */
@@ -236,29 +222,16 @@ export function ModelSelect({
   const direction = view === "big" ? 1 : -1;
   const targetWidth = view === "big" ? BIG_WIDTH : SMALL_WIDTH;
 
-  const visibleModels = models;
-
   /* The compact picker holds the starred models. An empty favorites list
-     would leave a pointless picker — fall back to the preset lineup. */
-  const favoriteModels = visibleModels.filter((model) =>
-    favorites.has(model.key),
-  );
-  const compactModels =
-    favoriteModels.length > 0
-      ? favoriteModels
-      : visibleModels.filter((model) => !isCustomModelKey(model.key));
+     would leave a pointless picker — fall back to the whole lineup. */
+  const favoriteModels = models.filter((model) => favorites.has(model.key));
+  const compactModels = favoriteModels.length > 0 ? favoriteModels : models;
 
-  /* Browsing folds legacy models behind a count row at the foot of the
-     list; a typed query searches everything, legacy included (sorted
-     below the current lineup by the catalog). */
+  /* The catalog lists everything the filters keep; a typed query sorts it
+     by how well each model answers. */
   const trimmed = query.trim();
-  const filtered = filterModels(visibleModels, providerFilter, capabilityFilters);
-  const catalog = trimmed
-    ? searchModels(filtered, trimmed)
-    : filtered.filter((model) => !model.legacy);
-  const legacyModels = trimmed
-    ? []
-    : filtered.filter((model) => model.legacy);
+  const filtered = filterModels(models, providerFilter, capabilityFilters);
+  const catalog = trimmed ? searchModels(filtered, trimmed) : filtered;
 
   /* Deliberately keeps the popover open — picking a model is often step
      one of also setting the gates or stars; dismissal is a click-away. */
@@ -272,7 +245,6 @@ export function ModelSelect({
         if (next) {
           setView("small");
           setQuery("");
-          setLegacyOpen(false);
           setProviderFilter(null);
           setCapabilityFilters(new Set());
           setHeight("auto");
@@ -281,7 +253,7 @@ export function ModelSelect({
     >
       <PopoverTrigger
         aria-label="Choose model"
-        className="relative flex h-9 shrink-0 cursor-pointer items-center rounded-full px-3 text-[13.5px]/4 font-medium text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground data-popup-open:bg-black/[0.05] data-popup-open:text-foreground dark:hover:bg-white/[0.06] dark:data-popup-open:bg-white/[0.06]"
+        className="relative flex h-9 shrink-0 cursor-pointer items-center px-3 text-[13.5px]/4 font-medium text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground data-popup-open:bg-black/[0.05] data-popup-open:text-foreground dark:hover:bg-white/[0.06] dark:data-popup-open:bg-white/[0.06]"
       >
         {/* The width twin: identical content at rest pose, never visible. */}
         <span
@@ -293,7 +265,6 @@ export function ModelSelect({
             <ModelGlyph model={current} size={15} className="shrink-0" />
             {current.name}
           </span>
-          {searchShown && <IconSearch size={12} className="ml-1.5" />}
           {thinkingOn && <IconBrain size={12} className="ml-1.5" />}
         </span>
         <motion.span
@@ -311,17 +282,6 @@ export function ModelSelect({
               <ModelGlyph model={current} size={15} className="shrink-0" />
               {current.name}
             </motion.span>
-          </AnimatePresence>
-          <AnimatePresence initial={false}>
-            {searchShown && (
-              <motion.span
-                key="search"
-                {...GATE}
-                className="flex shrink-0 items-center overflow-hidden"
-              >
-                <IconSearch size={12} stroke={2.5} className="shrink-0" />
-              </motion.span>
-            )}
           </AnimatePresence>
           <AnimatePresence initial={false}>
             {thinkingOn && (
@@ -398,25 +358,11 @@ export function ModelSelect({
                       </button>
                     ))}
                     <div className="my-1 h-px bg-border" />
-                    {/* The whole row is the switch. */}
-                    {searchAvailable && (
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={searchShown}
-                        disabled={gatesLocked}
-                        onClick={() => onSearchOnChange(!searchOn)}
-                        className={`${ROW} justify-between disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent`}
-                      >
-                        Search
-                        <ToggleSwitch checked={searchShown} />
-                      </button>
-                    )}
                     {/* The thinking wheel as a slider — each stop is one of
                         the model's levels. Locked and single-level models
                         keep the plain label instead of a dead track. */}
                     <div
-                      className={`flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1 text-left text-[13.5px]/5 ${
+                      className={`flex w-full items-center justify-between gap-2 px-2 py-1 text-left text-[13.5px]/5 ${
                         gatesLocked || levels.length < 2
                           ? "opacity-50"
                           : ""
@@ -449,13 +395,13 @@ export function ModelSelect({
                     <button
                       type="button"
                       onClick={() => setView("small")}
-                      className="flex cursor-pointer items-center gap-1.5 rounded-lg px-1.5 py-1 text-[13.5px]/4 font-medium text-muted-foreground transition-colors duration-100 hover:text-foreground"
+                      className="flex cursor-pointer items-center gap-1.5 px-1.5 py-1 text-[13.5px]/4 font-medium text-muted-foreground transition-colors duration-100 hover:text-foreground"
                     >
                       <IconArrowLeft size={14} className="shrink-0" />
                       Back
                     </button>
                     <div className="mt-1.5 mb-1 flex items-center gap-1.5">
-                      <div className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-full bg-well px-3 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
+                      <div className="flex h-8 min-w-0 flex-1 items-center gap-2 bg-well px-3 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
                         <IconSearch
                           size={15}
                           className="shrink-0 text-muted-foreground"
@@ -469,7 +415,7 @@ export function ModelSelect({
                         />
                       </div>
                       <ModelFilterMenu
-                        models={visibleModels}
+                        models={models}
                         provider={providerFilter}
                         onProviderChange={setProviderFilter}
                         capabilities={capabilityFilters}
@@ -488,7 +434,7 @@ export function ModelSelect({
                       className="h-56 overflow-y-auto [scrollbar-gutter:stable]"
                     >
                     <div className="flex min-h-full flex-col">
-                    {catalog.length === 0 && legacyModels.length === 0 && (
+                    {catalog.length === 0 && (
                       <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
                         {trimmed ? (
                           <>No models match &quot;{query.trim()}&quot;</>
@@ -507,40 +453,6 @@ export function ModelSelect({
                         onToggleFavorite={() => toggleFavorite(model.key)}
                       />
                     ))}
-                    {/* The legacy shelf: retired models fold behind a count
-                        row until asked for. A typed search skips the shelf
-                        and just finds them. */}
-                    {legacyModels.length > 0 && (
-                      <>
-                        <button
-                          type="button"
-                          aria-expanded={legacyOpen}
-                          onClick={() => setLegacyOpen((prev) => !prev)}
-                          className={`${ROW} mt-0.5 py-1.5 text-muted-foreground`}
-                        >
-                          <IconArchive size={15} className="shrink-0" />
-                          {legacyModels.length} legacy{" "}
-                          {legacyModels.length === 1 ? "model" : "models"}
-                          <IconChevronDown
-                            size={14}
-                            className={`ml-auto shrink-0 transition-[rotate] duration-150 ${
-                              legacyOpen ? "rotate-180" : ""
-                            }`}
-                          />
-                        </button>
-                        {legacyOpen &&
-                          legacyModels.map((model) => (
-                            <CatalogRow
-                              key={model.key}
-                              model={model}
-                              selected={value === model.key}
-                              favorite={favorites.has(model.key)}
-                              onSelect={() => selectModel(model.key)}
-                              onToggleFavorite={() => toggleFavorite(model.key)}
-                            />
-                          ))}
-                      </>
-                    )}
                     </div>
                     </div>
                     <ScrollFade side="top" visible={fades.top} from="from-popover" />
@@ -561,8 +473,7 @@ export function ModelSelect({
   );
 }
 
-/* One catalog list row: the model button plus the favorite star. Shared
-   by the main list and the legacy shelf. */
+/* One catalog list row: the model button plus the favorite star. */
 function CatalogRow({
   model,
   selected,
@@ -581,7 +492,7 @@ function CatalogRow({
       <button
         type="button"
         onClick={onSelect}
-        className="flex w-full cursor-pointer flex-col gap-1 rounded-lg px-2 py-1.5 pr-10 text-left transition-colors duration-100 hover:bg-accent"
+        className="flex w-full cursor-pointer flex-col gap-1 px-2 py-1.5 pr-10 text-left transition-colors duration-100 hover:bg-accent"
       >
         <span className="flex items-center gap-2 text-[13.5px]/5 font-medium">
           <ModelGlyph
@@ -605,7 +516,7 @@ function CatalogRow({
         }
         aria-pressed={favorite}
         onClick={onToggleFavorite}
-        className="absolute top-1.5 right-1.5 flex size-6 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-[background-color,color,scale] duration-150 hover:bg-black/[0.05] hover:text-foreground active:scale-90 dark:hover:bg-white/[0.06]"
+        className="absolute top-1.5 right-1.5 flex size-6 cursor-pointer items-center justify-center text-muted-foreground transition-[background-color,color,scale] duration-150 hover:bg-black/[0.05] hover:text-foreground active:scale-90 dark:hover:bg-white/[0.06]"
       >
         {favorite ? <IconStarFilled size={14} /> : <IconStar size={14} />}
       </button>

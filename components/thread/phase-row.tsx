@@ -74,7 +74,7 @@ export function PhaseRow({ phase }: { phase: MessagePhase }) {
           setOpen((current) => !current);
         }}
         aria-expanded={expandable ? open : undefined}
-        className={`-mx-1 flex max-w-full items-center gap-2 rounded-md px-1 py-0.5 text-left ${
+        className={`-mx-1 flex max-w-full items-center gap-2 px-1 py-0.5 text-left ${
           expandable
             ? "cursor-pointer transition-colors duration-150 hover:bg-black/[0.04] dark:hover:bg-white/[0.05]"
             : "cursor-default"

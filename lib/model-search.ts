@@ -82,21 +82,12 @@ const FULL_NAME_WEIGHT = 0.98;
 const COMPANY_WEIGHT = 0.8;
 const ALIAS_WEIGHT = 0.75;
 
-/** Retired models still answer a search — they just yield to the current
- *  lineup, the way they're folded away while browsing. A penalty rather
- *  than a hard partition, so an exact hit on a retired model still beats
- *  a loose hit on a current one. */
-const LEGACY_PENALTY = 25;
-
 /** How well a model answers a query, 0 for not at all. */
 export function scoreModel(model: ComposerModel, query: string): number {
   let best = NO_MATCH;
-  let exact = false;
   const consider = (text: string | undefined, weight: number) => {
     if (!text) return;
-    const raw = scoreText(text, query);
-    if (raw === EXACT || raw === SQUASHED_EXACT) exact = true;
-    best = Math.max(best, raw * weight);
+    best = Math.max(best, scoreText(text, query) * weight);
   };
 
   consider(model.name, NAME_WEIGHT);
@@ -104,12 +95,7 @@ export function scoreModel(model: ComposerModel, query: string): number {
   consider(model.company, COMPANY_WEIGHT);
   for (const alias of model.aliases) consider(alias, ALIAS_WEIGHT);
 
-  if (best === NO_MATCH) return NO_MATCH;
-  /* Typing a model's whole name is a request for that model, retired or
-     not — only looser matches yield to the current lineup. Never let the
-     penalty push a real match down to "no match" either. */
-  if (exact || !model.legacy) return best;
-  return Math.max(1, best - LEGACY_PENALTY);
+  return best;
 }
 
 /** The models a query matches, best first; ties keep catalog order. An

@@ -93,7 +93,7 @@ export function DeviceStatusPills() {
           <button
             type="button"
             onClick={() => setDialogOpen(true)}
-            className="inline-flex items-center gap-1 rounded-full bg-orange-500/12 px-2 py-1 text-[11px] font-medium text-orange-700 dark:text-orange-300"
+            className="inline-flex items-center gap-1 bg-orange-500/12 px-2 py-1 text-[11px] font-medium text-orange-700 dark:text-orange-300"
           >
             {(() => {
               const Icon = COPY[status].icon;

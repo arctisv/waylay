@@ -246,7 +246,7 @@ export class ThreadErrorBoundary extends Component<
           <button
             type="button"
             onClick={() => this.setState({ failed: false })}
-            className="cursor-pointer rounded-full bg-primary px-3.5 py-2 text-[13px]/4 font-medium text-primary-foreground transition-[background-color,scale] duration-150 hover:bg-(--primary-hover) active:scale-[0.96]"
+            className="cursor-pointer bg-primary px-3.5 py-2 text-[13px]/4 font-medium text-primary-foreground transition-[background-color,scale] duration-150 hover:bg-(--primary-hover) active:scale-[0.96]"
           >
             Try again
           </button>
@@ -256,7 +256,7 @@ export class ThreadErrorBoundary extends Component<
               this.setState({ failed: false });
               this.props.onBackHome();
             }}
-            className="cursor-pointer rounded-full px-3.5 py-2 text-[13px]/4 font-medium text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]"
+            className="cursor-pointer px-3.5 py-2 text-[13px]/4 font-medium text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]"
           >
             Back home
           </button>

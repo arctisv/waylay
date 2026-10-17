@@ -1,26 +1,37 @@
 <svg width="240" height="242" viewBox="-30 -30 240 242" fill="none" xmlns="http://www.w3.org/2000/svg">
   <style>
-    /* ~2.4s cycle: the ring turns clockwise while the dot orbits the
-       other way, both landing back on the rest pose for a short pause. */
-    .ring, .dot {
-      transform-box: view-box;
-      transform-origin: 90px 91px;
-      animation-duration: 2.4s;
-      animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
-      animation-iteration-count: infinite;
+    /* ~2.4s cycle: a quick cascade around the ring, then a beat of rest. */
+    .t {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: turn 2.4s cubic-bezier(0.55, 0, 0.3, 1) infinite;
     }
-    .ring { animation-name: turn; }
-    .dot { animation-name: orbit; }
     @keyframes turn {
-      0% { transform: rotate(0deg); }
-      80%, 100% { transform: rotate(360deg); }
+      0% { translate: 0 0; rotate: 0deg; scale: 1; }
+      30% { translate: var(--dx) var(--dy); rotate: 45deg; scale: 1.18; }
+      60%, 100% { translate: 0 0; rotate: 90deg; scale: 1; }
     }
-    @keyframes orbit {
-      0% { transform: rotate(0deg) scale(1); }
-      40% { transform: rotate(-180deg) scale(0.8); }
-      80%, 100% { transform: rotate(-360deg) scale(1); }
-    }
+    .t0 { animation-delay: 0.000s; }
+    .t1 { animation-delay: 0.045s; }
+    .t2 { animation-delay: 0.090s; }
+    .t3 { animation-delay: 0.135s; }
+    .t4 { animation-delay: 0.180s; }
+    .t5 { animation-delay: 0.225s; }
+    .t6 { animation-delay: 0.270s; }
+    .t7 { animation-delay: 0.315s; }
+    .t8 { animation-delay: 0.360s; }
+    .t9 { animation-delay: 0.405s; }
   </style>
-  <path class="ring" d="M156.26 75.70A68 68 0 1 1 105.30 24.74" stroke="black" stroke-width="26" stroke-linecap="round"/>
-  <circle class="dot" cx="105.56" cy="75.44" r="20" fill="black"/>
+  <g fill="black">
+  <rect class="t t0" style="--dx:0.00px;--dy:-7.00px" x="86.00" y="23.00" width="8.00" height="8.00" transform="rotate(0.0 90.00 27.00)"/>
+  <rect class="t t1" style="--dx:4.11px;--dy:-5.66px" x="122.51" y="34.11" width="10.22" height="10.22" transform="rotate(36.0 127.62 39.22)"/>
+  <rect class="t t2" style="--dx:6.66px;--dy:-2.16px" x="144.65" y="65.00" width="12.44" height="12.44" transform="rotate(72.0 150.87 71.22)"/>
+  <rect class="t t3" style="--dx:6.66px;--dy:2.16px" x="143.53" y="103.44" width="14.67" height="14.67" transform="rotate(108.0 150.87 110.78)"/>
+  <rect class="t t4" style="--dx:4.11px;--dy:5.66px" x="119.17" y="134.33" width="16.89" height="16.89" transform="rotate(144.0 127.62 142.78)"/>
+  <rect class="t t5" style="--dx:0.00px;--dy:7.00px" x="80.44" y="145.44" width="19.11" height="19.11" transform="rotate(180.0 90.00 155.00)"/>
+  <rect class="t t6" style="--dx:-4.11px;--dy:5.66px" x="41.72" y="132.11" width="21.33" height="21.33" transform="rotate(216.0 52.38 142.78)"/>
+  <rect class="t t7" style="--dx:-6.66px;--dy:2.16px" x="17.35" y="99.00" width="23.56" height="23.56" transform="rotate(252.0 29.13 110.78)"/>
+  <rect class="t t8" style="--dx:-6.66px;--dy:-2.16px" x="16.24" y="58.33" width="25.78" height="25.78" transform="rotate(288.0 29.13 71.22)"/>
+  <rect class="t t9" style="--dx:-4.11px;--dy:-5.66px" x="38.38" y="25.22" width="28.00" height="28.00" transform="rotate(324.0 52.38 39.22)"/>
+  </g>
 </svg>

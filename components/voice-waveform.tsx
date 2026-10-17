@@ -130,7 +130,7 @@ export function VoiceWaveform({
           /* Grows from the middle out: `scale` is a standalone property in
              Tailwind v4 and the default origin is the center, so one axis is
              all the mirroring this needs. */
-          className="h-full w-[4px] shrink-0 rounded-full bg-foreground-soft"
+          className="h-full w-[4px] shrink-0 bg-foreground-soft"
           style={{ scale: `1 ${MIN_SCALE}` }}
         />
       ))}

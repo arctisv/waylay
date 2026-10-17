@@ -16,7 +16,7 @@ function ToastCard({ toast }: { toast: Toast }) {
       exit={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
       transformTemplate={pinRasterPath}
-      className="raised pointer-events-auto flex w-[min(20rem,calc(100vw-2rem))] items-center gap-2.5 rounded-xl bg-popover py-2 pr-2 pl-3 text-popover-foreground ring-1 ring-border"
+      className="raised pointer-events-auto flex w-[min(20rem,calc(100vw-2rem))] items-center gap-2.5 bg-popover py-2 pr-2 pl-3 text-popover-foreground ring-1 ring-border"
     >
       {toast.kind === "delete" && (
         <IconTrashFilled size={15} className="shrink-0 text-muted-foreground" />

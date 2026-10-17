@@ -2,7 +2,6 @@
 
 import { StoreTabs } from "@/components/store-tabs";
 import { SETTINGS_SECTIONS } from "@/lib/settings-sections";
-import { useSettingsSections } from "@/lib/deployment-features";
 import { useView } from "@/lib/view";
 
 /* Section navigation for a phone. On a desktop the sections are rows in
@@ -24,13 +23,12 @@ const LABELS: Record<(typeof SETTINGS_SECTIONS)[number], string> = {
 
 export function SectionStrip() {
   const { section, setSection } = useView();
-  const sections = useSettingsSections();
 
   return (
     <StoreTabs
       value={section}
       onChange={setSection}
-      tabs={sections.map((key) => ({ value: key, label: LABELS[key] }))}
+      tabs={SETTINGS_SECTIONS.map((key) => ({ value: key, label: LABELS[key] }))}
       glide={false}
       /* Bleeds into the pane's px-4 so the row of chips runs edge to edge
          and reads as scrollable, with the padding restored inside. */

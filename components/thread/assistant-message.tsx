@@ -286,7 +286,7 @@ function ErrorBanner({
   onRetry?: () => void;
 }) {
   return (
-    <div className="flex w-full max-w-md flex-col gap-3 rounded-2xl bg-well px-4 py-3.5 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
+    <div className="flex w-full max-w-md flex-col gap-3 bg-well px-4 py-3.5 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
       <div className="flex items-start gap-2.5">
         <IconAlertTriangleFilled
           size={17}
@@ -304,7 +304,7 @@ function ErrorBanner({
           <button
             type="button"
             onClick={onRetry}
-            className="cursor-pointer rounded-full bg-primary px-3 py-1.5 text-[13px]/4 font-medium text-primary-foreground transition-[background-color,scale] duration-150 hover:bg-(--primary-hover) active:scale-[0.96]"
+            className="cursor-pointer bg-primary px-3 py-1.5 text-[13px]/4 font-medium text-primary-foreground transition-[background-color,scale] duration-150 hover:bg-(--primary-hover) active:scale-[0.96]"
           >
             Try again
           </button>

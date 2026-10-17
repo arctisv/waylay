@@ -18,10 +18,8 @@ import {
 } from "@/lib/attachments";
 import { useAskBeforeBigPastePref } from "@/lib/chat-prefs";
 import { useCoarsePointer } from "@/lib/coarse-pointer";
-import { useDeploymentFeatures } from "@/lib/deployment-features";
 import {
   effectiveGates,
-  useSearchPref,
   useThinkingPref,
   type ComposerGates,
 } from "@/lib/composer-gates";
@@ -163,15 +161,10 @@ export function Composer({
   const plusRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
 
-  /* The gates live here, not in the model picker — the command palette
-     and the picker both read and write the same pair. Sticky across
-     visits like the model pick (lib/composer-gates.ts), so thinking
-     turned off stays off. */
-  const [searchPref, setSearchOn] = useSearchPref();
-  /* Web search is optional per deployment; without it the toggle hides
-     and every send goes out without it. */
-  const { search: searchAvailable } = useDeploymentFeatures();
-  const searchOn = searchAvailable && searchPref;
+  /* The thinking gate lives here, not in the model picker — the command
+     palette and the picker both read and write it. Sticky across visits
+     like the model pick (lib/composer-gates.ts), so thinking turned off
+     stays off. */
   const [thinking, setThinking] = useThinkingPref();
   const coarsePointer = useCoarsePointer();
   const [expanded, setExpanded] = useState(false);
@@ -330,7 +323,7 @@ export function Composer({
         value.trim(),
         model,
         files,
-        effectiveGates(currentModel, { search: searchOn, thinking }),
+        effectiveGates(currentModel, { thinking }),
       );
       attachments.clear();
     } catch {
@@ -438,9 +431,6 @@ export function Composer({
     () => ({
       model,
       setModel: onModelChange,
-      searchAvailable,
-      searchOn,
-      setSearchOn,
       thinking,
       setThinking,
       models,
@@ -449,9 +439,6 @@ export function Composer({
     [
       model,
       onModelChange,
-      searchAvailable,
-      searchOn,
-      setSearchOn,
       thinking,
       setThinking,
       models,
@@ -477,7 +464,7 @@ export function Composer({
      pill and must never be clipped by the morph's overflow-hidden. */
   return (
     <div
-      className={`relative rounded-[26px] border border-[var(--well-outline)] ${
+      className={`relative border border-[var(--well-outline)] ${
         floating
           ? "bg-(--well-translucent) backdrop-blur-xl"
           : "bg-well"
@@ -608,9 +595,6 @@ export function Composer({
                   <ModelSelect
                     value={model}
                     onValueChange={onModelChange}
-                    searchAvailable={searchAvailable}
-                    searchOn={searchOn}
-                    onSearchOnChange={setSearchOn}
                     thinking={thinking}
                     onThinkingChange={setThinking}
                   />
@@ -664,7 +648,7 @@ export function Composer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15, ease: "linear" }}
-            className="pointer-events-none fixed inset-3 z-50 flex items-center justify-center rounded-3xl border-2 border-dashed border-foreground/25 bg-background/70 backdrop-blur-sm"
+            className="pointer-events-none fixed inset-3 z-50 flex items-center justify-center border-2 border-dashed border-foreground/25 bg-background/70 backdrop-blur-sm"
           >
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <IconCloudUpload size={28} stroke={1.8} />

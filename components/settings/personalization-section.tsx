@@ -74,7 +74,7 @@ export function PersonalizationSection() {
         <SettingsCard>
           <SettingsRow
             title="Reset personalization"
-            description="Back to graphite ink, a neutral canvas, and starters on the home screen."
+            description="Back to the Waylay accent, a neutral canvas, and starters on the home screen."
             control={
               <Button variant="secondary" disabled={isDefault} onClick={reset}>
                 <IconRestore size={16} />

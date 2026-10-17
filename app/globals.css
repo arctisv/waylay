@@ -75,11 +75,16 @@
   --card-foreground: #141414;
   --popover: #ffffff;
   --popover-foreground: #141414;
-  --primary: oklch(0.17 0 0);
+  /* Waylay's ink: deep blue as a flat color, and a black-to-blue gradient
+     with a film of grain wherever a surface is filled with it (the
+     .bg-primary rule in app/accents.css). Picking another accent in
+     Personalization swaps both for that accent's flat color. */
+  --primary: oklch(0.36 0.16 264);
   /* Solid hover tone — bg-primary/90 would compile to solid (see the
      translucent-popover note), so the hover shade is its own token. */
-  --primary-hover: oklch(0.28 0 0);
+  --primary-hover: oklch(0.42 0.17 264);
   --primary-foreground: oklch(0.985 0 0);
+  --accent-gradient: linear-gradient(135deg, #09090b 0%, #0c1c52 52%, #2563eb 100%);
   --secondary: oklch(0.96 0 0);
   --secondary-foreground: oklch(0.2 0 0);
   /* A step below the chrome so skeleton bones stay visible on the rail. */
@@ -104,33 +109,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  /* Chart series colors. The one sanctioned break from the monochrome rule:
-     a chart that encodes identity has to use hue, and greys can't carry more
-     than two series. This is the validated categorical palette, kept in its
-     adjacent-pair order — the ordering IS the colorblind-safety mechanism,
-     so slots are assigned in sequence and never re-shuffled or cycled. The
-     dark column is the same eight hues re-stepped for #181818, not a second
-     palette. Validated against both of Waylay's surfaces: worst adjacent CVD
-     ΔE 9.1 light / 8.4 dark, normal-vision 19.6 / 19.3. Aqua, yellow, and
-     magenta sit under 3:1 on white, so a chart always ships a legend and
-     hover values (the relief rule) — see lib/chart-palette.ts. */
-  --series-1: #2a78d6;
-  --series-2: #eb6834;
-  --series-3: #1baf7a;
-  --series-4: #eda100;
-  --series-5: #e87ba4;
-  --series-6: #008300;
-  --series-7: #4a3aa7;
-  --series-8: #e34948;
-  /* The Platinum wordmark's metal, painted through a mask of the badge art
-     (see components/platinum/platinum-wordmark.tsx). The one place a hint of
-     chroma is allowed outside the chart series: "platinum" has to look like
-     metal, and metal isn't grey — it's cool grey with a highlight. Light mode
-     runs dark→mid so the mark reads on white; dark mode is the badge's own
-     gradient, which was drawn for a dark ground. */
-  --platinum-metal-from: #5a6169;
-  --platinum-metal-to: #9ba2aa;
-  --radius: 0.75rem;
+  --radius: 0;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -162,14 +141,15 @@
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
     "Liberation Mono", "Courier New", monospace;
 
-  --radius-xs: 0.75rem;
-  --radius-sm: 0.75rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 0.75rem;
-  --radius-2xl: 0.75rem;
-  --radius-3xl: 0.75rem;
-  --radius-4xl: 0.75rem;
+  /* Waylay is square: every radius step is zero. */
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-4xl: 0;
 
   --font-heading: var(--font-sans);
 
@@ -256,9 +236,10 @@
      separate #181818 from #181818. */
   --popover: #262626;
   --popover-foreground: #f0f0f0;
-  --primary: oklch(0.9 0 0);
-  --primary-hover: oklch(0.95 0 0);
+  --primary: oklch(0.8 0.1 262);
+  --primary-hover: oklch(0.85 0.09 262);
   --primary-foreground: oklch(0.17 0 0);
+  --accent-gradient: linear-gradient(135deg, #ffffff 0%, #d9e5ff 40%, #4d8bff 100%);
   --secondary: #292929;
   --secondary-foreground: oklch(0.985 0 0);
   /* Clears the rail as well as the panel, or skeleton bones vanish into
@@ -283,17 +264,6 @@
   /* Same eight hues, stepped for the dark surface (all clear 3:1 on
      #181818). Green is mode-invariant — its light step already sits in the
      dark band. */
-  --series-1: #3987e5;
-  --series-2: #d95926;
-  --series-3: #199e70;
-  --series-4: #c98500;
-  --series-5: #d55181;
-  --series-6: #008300;
-  --series-7: #9085e9;
-  --series-8: #e66767;
-  /* The badge art's own gradient, drawn for a dark ground. */
-  --platinum-metal-from: #939ea9;
-  --platinum-metal-to: #fcfbfc;
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -323,78 +293,6 @@ body {
   font-feature-settings:
     "liga" 1,
     "calt" 1;
-}
-
-/* /platinum is its own room. It stays dark whatever the app theme is doing,
-   and darker than the app's own dark — the wordmark is polished metal, and
-   metal needs something deep to sit on.
-
-   Applied alongside `dark` on the same element, which is what does the real
-   work: the token block below re-points the vars for the subtree, and the
-   `dark` class makes descendants match the `dark:` variant
-   (`&:where(.dark, .dark *)`) so component-level dark styling fires too.
-   Anything that portals out of the page (the request dialog) has to carry
-   both classes itself or it lands back in the app's theme. */
-.platinum-page {
-  --background: #08090a;
-  --surface: #121316;
-  --well: #17181b;
-  --border: rgb(255 255 255 / 0.08);
-  --foreground: #f5f5f6;
-  --foreground-soft: oklch(0.78 0 0);
-  --card: #121316;
-  --card-foreground: #f5f5f6;
-  --popover: #17181b;
-  --popover-foreground: #f5f5f6;
-  --popover-translucent: rgb(23 24 27 / 0.9);
-  /* Buttons invert to near-white on this ground, so the primary pair flips. */
-  --primary: #eceded;
-  --primary-hover: #ffffff;
-  --primary-foreground: #0a0b0c;
-  --secondary: #1e2024;
-  --secondary-foreground: #f5f5f6;
-  --muted: #1b1d20;
-  --muted-foreground: oklch(0.7 0 0);
-  --accent: #24262a;
-  --accent-pressed: #1e2024;
-  --accent-foreground: #f5f5f6;
-  --input: rgb(255 255 255 / 0.14);
-  --ring: oklch(0.58 0 0);
-}
-
-/* The ground is a separate class from the tokens above, because the request
-   dialog wants the palette but NOT the page's backdrop — it has a popover
-   surface of its own. A single cold highlight behind the masthead, as if the
-   page were lit from above. Painted on the element's own background: no extra
-   element, and no filter (a filter here would pin the whole page into its own
-   render surface — see lib/motion.ts). */
-.platinum-ground {
-  background-color: var(--background);
-  background-image: radial-gradient(
-    120% 100% at 50% 0%,
-    rgb(147 158 169 / 0.17) 0%,
-    rgb(147 158 169 / 0.05) 40%,
-    transparent 72%
-  );
-  background-repeat: no-repeat;
-  /* Pinned to the masthead rather than left at `auto`, which would size the
-     gradient to the whole page box — on a long page that stretches one
-     highlight over the entire scroll instead of lighting the top of it. */
-  background-size: 100% 760px;
-  background-position: top center;
-}
-
-/* Hairline in the wordmark's own metal, for section rules. */
-.platinum-rule {
-  height: 1px;
-  border: 0;
-  background-image: linear-gradient(
-    90deg,
-    transparent,
-    rgb(147 158 169 / 0.32) 22%,
-    rgb(147 158 169 / 0.32) 78%,
-    transparent
-  );
 }
 
 /* Shimmering text (ai-sdk elements style): the glyphs go transparent and
@@ -483,63 +381,9 @@ body {
   }
 }
 
-/* The artifact cards' indeterminate "working" bar. CSS, not motion: the
-   cards re-render on every streamed delta, and a JS keyframe loop would
-   restart each time — freezing the bar off-screen. CSS runs on the
-   compositor, untouched by React re-renders. */
-@keyframes artifact-progress {
-  0% {
-    transform: translateX(-120%);
-  }
-  100% {
-    transform: translateX(330%);
-  }
-}
-
-.artifact-progress-bar {
-  animation: artifact-progress 1.1s ease-in-out infinite;
-}
-
-@keyframes artifact-progress-pulse {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-  50% {
-    opacity: 0.9;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .artifact-progress-bar {
-    animation: artifact-progress-pulse 1.4s ease-in-out infinite;
-    transform: none;
-  }
-}
-
-/* One-shot ease-in for content that lands after a loading state (artifact
-   panel bodies, the thread transcript). Opacity only — no transforms
-   (raster snap) and never near an iframe (frozen-iframe compositing, see
-   html-frame-view.tsx). */
-@keyframes body-fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
-.body-fade-in {
-  animation: body-fade-in 0.2s ease-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .body-fade-in {
-    animation: none;
-  }
-}
-
-/* The gleam sweeping across a generated image's placeholder square. Same
-   CSS-not-motion rule as the bar above — the message row re-renders on
-   every reactive update while the paint is in flight. */
+/* The gleam sweeping across a generated image's placeholder square. CSS,
+   not motion: the message row re-renders on every reactive update while
+   the paint is in flight, and a JS keyframe loop would restart each time. */
 @keyframes image-shimmer {
   0% {
     transform: translateX(-120%);
@@ -553,261 +397,20 @@ body {
   animation: image-shimmer 1.2s ease-in-out infinite;
 }
 
+@keyframes image-shimmer-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .image-shimmer-gleam {
-    animation: artifact-progress-pulse 1.4s ease-in-out infinite;
+    animation: image-shimmer-pulse 1.4s ease-in-out infinite;
     transform: none;
-  }
-}
-
-/* The open-source hero's slow orbits (components/open-source). Each ring
-   and each satellite on it runs this one turn, the satellites in the
-   opposite direction, so they stay upright. Duration and direction come
-   inline per orbit. It animates `rotate`, never `transform`, so motion's
-   entrance transforms on the same subtree never fight it. */
-@keyframes oss-orbit {
-  to {
-    rotate: 360deg;
-  }
-}
-
-.oss-orbit {
-  animation: oss-orbit 60s linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .oss-orbit {
-    animation: none;
-  }
-}
-
-/* ---- TipTap document editor (artifact side panel) ---- */
-.tiptap-prose {
-  font-size: 14.5px;
-  line-height: 1.7;
-  color: var(--foreground);
-  -webkit-font-smoothing: antialiased;
-}
-.tiptap-prose:focus {
-  outline: none;
-}
-.tiptap-prose > * + * {
-  margin-top: 0.85em;
-}
-.tiptap-prose h1,
-.tiptap-prose h2,
-.tiptap-prose h3,
-.tiptap-prose h4 {
-  font-weight: 650;
-  line-height: 1.3;
-  margin-top: 1.5em;
-  color: var(--foreground);
-}
-.tiptap-prose h1 {
-  font-size: 1.6em;
-}
-.tiptap-prose h2 {
-  font-size: 1.3em;
-}
-.tiptap-prose h3 {
-  font-size: 1.12em;
-}
-.tiptap-prose ul,
-.tiptap-prose ol {
-  padding-left: 1.4em;
-}
-.tiptap-prose ul {
-  list-style: disc;
-}
-.tiptap-prose ol {
-  list-style: decimal;
-}
-.tiptap-prose li > * + * {
-  margin-top: 0.3em;
-}
-.tiptap-prose li::marker {
-  color: var(--muted-foreground);
-}
-.tiptap-prose a {
-  color: #2563eb;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.dark .tiptap-prose a {
-  color: #7aa2ff;
-}
-.tiptap-prose blockquote {
-  border-left: 3px solid var(--border);
-  padding-left: 1em;
-  color: var(--muted-foreground);
-  font-style: italic;
-}
-.tiptap-prose code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.88em;
-  background: rgba(0, 0, 0, 0.05);
-  padding: 0.12em 0.36em;
-  border-radius: 5px;
-}
-.dark .tiptap-prose code {
-  background: rgba(255, 255, 255, 0.08);
-}
-.tiptap-prose pre {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  padding: 0.9em 1.1em;
-  overflow-x: auto;
-}
-.dark .tiptap-prose pre {
-  background: rgba(255, 255, 255, 0.06);
-}
-.tiptap-prose pre code {
-  background: transparent;
-  padding: 0;
-  font-size: 0.86em;
-}
-.tiptap-prose hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 1.6em 0;
-}
-.tiptap-prose img {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--radius-lg);
-}
-.tiptap-prose img.ProseMirror-selectednode {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.tiptap-prose p.is-editor-empty:first-child::before {
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
-  color: var(--muted-foreground);
-}
-
-/* ---- Tables ---- */
-.tiptap-prose .tableWrapper {
-  overflow-x: auto;
-  margin: 0.6em 0;
-}
-.tiptap-prose table {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 0.6em 0;
-  font-size: 0.95em;
-  table-layout: fixed;
-  overflow: hidden;
-}
-.tiptap-prose .tableWrapper table {
-  margin: 0;
-}
-.tiptap-prose th,
-.tiptap-prose td {
-  position: relative;
-  min-width: 4em;
-  border: 1px solid var(--border);
-  padding: 0.45em 0.65em;
-  vertical-align: top;
-  text-align: left;
-}
-.tiptap-prose th {
-  background: rgba(0, 0, 0, 0.035);
-  font-weight: 620;
-}
-.dark .tiptap-prose th {
-  background: rgba(255, 255, 255, 0.05);
-}
-.tiptap-prose th > *,
-.tiptap-prose td > * {
-  margin: 0;
-}
-/* The cell(s) under an active table selection. */
-.tiptap-prose .selectedCell::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(12, 130, 242, 0.1);
-  pointer-events: none;
-}
-/* Column resize affordance (resizable tables). */
-.tiptap-prose .column-resize-handle {
-  position: absolute;
-  top: 0;
-  bottom: -2px;
-  right: -2px;
-  width: 4px;
-  background: #0c82f2;
-  pointer-events: none;
-}
-.tiptap-prose.resize-cursor {
-  cursor: col-resize;
-}
-
-/* ---- Math (KaTeX) ---- */
-.tiptap-prose .katex {
-  font-size: 1.05em;
-}
-/* Block math centers itself via the node view; cancel KaTeX's own margins
-   so spacing comes from the wrapper, not both. */
-.tiptap-prose .katex-display {
-  margin: 0;
-}
-.tiptap-prose [data-type="block-math"] .katex-display {
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0.15em 0;
-}
-
-/*
- * Transient highlight painted over a region Waylay just edited (see
- * components/editor/edit-highlight.ts). A soft amber wash eases in, holds
- * for a beat, then fades out on its own — so the decoration only has to be
- * applied, not animated in JS.
- */
-.tiptap-prose .edit-flash {
-  border-radius: 3px;
-  animation: editFlash 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-@keyframes editFlash {
-  0% {
-    background-color: rgba(251, 191, 36, 0);
-    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
-  }
-  14% {
-    background-color: rgba(251, 191, 36, 0.34);
-    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.22);
-  }
-  55% {
-    background-color: rgba(251, 191, 36, 0.34);
-    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.16);
-  }
-  100% {
-    background-color: rgba(251, 191, 36, 0);
-    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
-  }
-}
-.dark .tiptap-prose .edit-flash {
-  animation-name: editFlashDark;
-}
-@keyframes editFlashDark {
-  0% {
-    background-color: rgba(251, 191, 36, 0);
-    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
-  }
-  14% {
-    background-color: rgba(251, 191, 36, 0.26);
-    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.16);
-  }
-  55% {
-    background-color: rgba(251, 191, 36, 0.26);
-    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.12);
-  }
-  100% {
-    background-color: rgba(251, 191, 36, 0);
-    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
   }
 }
 
@@ -996,6 +599,15 @@ body {
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0.15em 0.1em;
+}
+
+/* Square corners everywhere. Unlayered on purpose: it outranks every
+   layered utility, including the fixed-radius ones Streamdown ships
+   (`rounded`, `rounded-full`) for code blocks and badges. */
+*,
+::before,
+::after {
+  border-radius: 0;
 }
 
 @layer base {

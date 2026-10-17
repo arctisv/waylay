@@ -68,7 +68,7 @@ export function MermaidDiagram({
   }, [svg]);
 
   return (
-    <div className="my-3 overflow-hidden rounded-xl border border-border">
+    <div className="my-3 overflow-hidden border border-border">
       <div className="flex h-10 items-center gap-2 border-b border-border bg-muted/35 px-3">
         <IconSitemap size={15} className="text-muted-foreground" />
         <span className="min-w-0 flex-1 truncate text-xs font-medium">
@@ -82,7 +82,7 @@ export function MermaidDiagram({
             setCopied(true);
             window.setTimeout(() => setCopied(false), 1200);
           }}
-          className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
         </button>
@@ -91,7 +91,7 @@ export function MermaidDiagram({
             type="button"
             aria-label="Open diagram in a new tab"
             onClick={open}
-            className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
           >
             <IconArrowUpRight size={14} />
           </button>

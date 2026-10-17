@@ -38,7 +38,6 @@ export type QueueMessageArgs = {
   text: string;
   model: string;
   attachments: AttachmentUpload[];
-  search: boolean;
   thinking: ThinkingLevel;
 };
 
@@ -108,7 +107,6 @@ export function useQueueActions() {
       text,
       model,
       attachments,
-      search,
       thinking,
     }: QueueMessageArgs) => {
       const result = await enqueue({
@@ -130,7 +128,6 @@ export function useQueueActions() {
           : {}),
         options: {
           thinking: thinking !== "none",
-          search,
           model: wireModel(model),
         },
       });

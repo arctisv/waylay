@@ -99,20 +99,10 @@ export const DEFAULT_MODEL_KEY: ChatModelKey = "Auto";
 /* What the picker actually renders: the static lineup above, each tier
    wearing the maker and full name of the model it runs
    (lib/model-catalog.ts). */
-export type ComposerModel = Omit<ChatModel, "key" | "icon"> & {
-  key: string;
-  icon?: Icon;
-  iconSvg?: string;
+export type ComposerModel = ChatModel & {
+  /** Who made the model it runs ("Meta"). Absent on Auto. */
   company?: string;
-  /** The maker's full model name ("Claude Fable 5") — what the search
-   *  list shows. Absent on white-labeled tiers, which go by `name`. */
+  /** The tier with the model it runs ("Fast · Llama 3.2 1B") — what the
+   *  catalog list shows. Absent on Auto, which goes by `name`. */
   fullName?: string;
-  /** Admin-retired: hidden from the picker's lists until a typed search
-   *  matches it. Still fully usable once picked. */
-  legacy?: boolean;
 };
-
-/** Catalog models are keyed by slug; tier keys never contain a slash. */
-export function isCustomModelKey(key: string): boolean {
-  return key.includes("/");
-}

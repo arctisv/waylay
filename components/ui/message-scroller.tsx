@@ -104,7 +104,7 @@ function MessageScrollerButton({
       data-slot="message-scroller-button"
       direction="end"
       className={cn(
-        "raised absolute left-1/2 z-20 flex size-9 -translate-x-1/2 cursor-pointer items-center justify-center rounded-full border border-border bg-popover text-foreground transition-[translate,scale,opacity,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-accent data-[active=true]:[transition-delay:150ms,150ms,150ms,0s] data-[active=false]:pointer-events-none data-[active=false]:translate-y-2 data-[active=false]:scale-90 data-[active=false]:opacity-0",
+        "raised absolute left-1/2 z-20 flex size-9 -translate-x-1/2 cursor-pointer items-center justify-center border border-border bg-popover text-foreground transition-[translate,scale,opacity,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-accent data-[active=true]:[transition-delay:150ms,150ms,150ms,0s] data-[active=false]:pointer-events-none data-[active=false]:translate-y-2 data-[active=false]:scale-90 data-[active=false]:opacity-0",
         className,
       )}
       {...props}

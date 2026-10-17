@@ -37,7 +37,7 @@ const REPLY_TOKENS = 1024;
 /** Phase updates (download progress, thinking text) are written at most this often. */
 const PHASE_WRITE_MS = 250;
 
-const LIVE_STATUSES = new Set(["thinking", "searching", "streaming"]);
+const LIVE_STATUSES = new Set(["thinking", "streaming"]);
 
 export function isMessageLive(message: MessageRow): boolean {
   return (
@@ -98,6 +98,8 @@ export function appendUserTurn({
   now: number;
 }) {
   const streamId = createId();
+  /* Only a reasoning model can think; any other turn just answers. */
+  const thinking = Boolean(options?.thinking) && localModelFor(options?.model).reasoning;
   const userMessageId = db.insert("messages", {
     threadId,
     role: "user",
@@ -112,12 +114,11 @@ export function appendUserTurn({
     content: "",
     createdAt: now + 1,
     updatedAt: now + 1,
-    status: options?.thinking ? "thinking" : "streaming",
+    status: thinking ? "thinking" : "streaming",
     phases: [],
     streamId,
     model: options?.model ?? "Auto",
-    thinking: options?.thinking ?? false,
-    search: false,
+    thinking,
   });
   db.setStream(streamId, { text: "", status: "pending" });
   startAssistantTurn(threadId, assistantId);

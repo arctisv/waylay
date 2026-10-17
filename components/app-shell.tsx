@@ -66,14 +66,15 @@ function useWarmAwayFace() {
 /** Everything that isn't the chat: they share the page slide's second face. */
 type AwayFaceName = "settings" | "history";
 
-/* Settings and the phone's chat list share the page slide's second face. Which one shows is latched: while none is open (the
-   face is sliding out), the last-open one keeps rendering, so the exit
-   animation never swaps content mid-flight. Hops between them while VISIBLE
-   ride the same quick pane flip the settings sections use — which is also
-   what a phone's tab bar wants, since three of its four tabs live here. But
-   a swap that happens off-screen (settings was latched, integrations opens
-   from home) must be silent: the epoch key remounts AnimatePresence so the
-   stale face vanishes instead of playing its exit over the incoming slide. */
+/* Settings and the phone's chat list share the page slide's second face.
+   Which one shows is latched: while none is open (the face is sliding out),
+   the last-open one keeps rendering, so the exit animation never swaps
+   content mid-flight. Hops between them while VISIBLE ride the same quick
+   pane flip the settings sections use — which is also what a phone's tab
+   bar wants, since two of its three tabs live here. But a swap that happens
+   off-screen (settings was latched, history opens from home) must be
+   silent: the epoch key remounts AnimatePresence so the stale face vanishes
+   instead of playing its exit over the incoming slide. */
 function AwayFace({ target }: { target: AwayFaceName | null }) {
   const open = target !== null;
 
@@ -176,7 +177,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
        scrolling that gets switched off underneath it. */
     <div className="app-frame flex h-dvh w-full flex-col bg-background md:flex-row">
       <Sidebar />
-      <main className="raised relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-surface md:my-2 md:mr-2 md:rounded-lg md:border md:border-border">
+      <main className="raised relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-surface md:my-2 md:mr-2 md:border md:border-border">
         <PageSlide
           page={awayFace === null ? 1 : 2}
           className="min-h-0 flex-1"

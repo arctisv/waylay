@@ -14,7 +14,6 @@ import {
   IconCheck,
   IconChevronDown,
   IconLoader2,
-  IconSearch,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 
@@ -23,7 +22,6 @@ import { scoreText } from "@/lib/model-search";
 import { pinRasterPath } from "@/lib/motion";
 import {
   THINKING_LABELS,
-  isCustomModelKey,
   type ComposerModel,
   type ThinkingLevel,
 } from "@/lib/models";
@@ -112,10 +110,6 @@ function filterCommands(commands: Command[], query: string): Command[] {
 export type CommandMenuContext = {
   model: string;
   setModel: (key: string) => void;
-  /** False when this deployment has no web search configured. */
-  searchAvailable: boolean;
-  searchOn: boolean;
-  setSearchOn: (on: boolean) => void;
   thinking: ThinkingLevel;
   setThinking: (level: ThinkingLevel) => void;
   models: ComposerModel[];
@@ -141,10 +135,7 @@ function buildCommands(
      fallback to the preset tiers when nothing's starred). Searching: every
      model. */
   const pinned = ctx.models.filter((model) => ctx.favorites.has(model.key));
-  const restingModels =
-    pinned.length > 0
-      ? pinned
-      : ctx.models.filter((model) => !isCustomModelKey(model.key));
+  const restingModels = pinned.length > 0 ? pinned : ctx.models;
   const modelPool = searching ? ctx.models : restingModels;
 
   const modelCommands: Command[] = modelPool.map((model) => ({
@@ -162,7 +153,7 @@ function buildCommands(
     onSelect: () => ctx.setModel(model.key),
   }));
 
-  /* Same gate math as the model picker: Auto runs the gates itself. */
+  /* Same gate math as the model picker: Auto runs the gate itself. */
   const gatesLocked = current?.autoGates ?? false;
   const levels = current?.thinkingLevels ?? ["none"];
   const level = clampThinking(current, ctx.thinking);
@@ -173,7 +164,6 @@ function buildCommands(
       ? "Auto"
       : "None"
     : THINKING_LABELS[level];
-  const searchHint = gatesLocked ? "Auto" : ctx.searchOn ? "On" : "Off";
 
   /* Thinking unfolds in place: selecting the row opens the level list
      right under it (the palette-only dropdown — the model picker keeps
@@ -210,26 +200,6 @@ function buildCommands(
             onSelect: () => ctx.setThinking(option),
           }),
         )
-      : []),
-    ...(ctx.searchAvailable
-      ? [
-          {
-            id: "gate:search",
-            label: "Web search",
-            glyph: (
-              <IconSearch
-                size={15}
-                stroke={2.25}
-                className="shrink-0 text-muted-foreground"
-              />
-            ),
-            keywords: ["web", "browse", "lookup", "internet", "toggle", "google"],
-            hint: searchHint,
-            disabled: gatesLocked,
-            disabledHint: gateDisabledHint,
-            onSelect: () => ctx.setSearchOn(!ctx.searchOn),
-          } satisfies Command,
-        ]
       : []),
   ];
 
@@ -529,7 +499,7 @@ export function useComposerCommandMenu({
           {...POP}
           role="menu"
           aria-label="Composer commands"
-          className="raised absolute bottom-full left-0 z-40 mb-2 w-[min(20rem,calc(100vw-1.5rem))] overflow-hidden rounded-xl bg-popover text-popover-foreground ring-1 ring-border dark:ring-white/[0.14]"
+          className="raised absolute bottom-full left-0 z-40 mb-2 w-[min(20rem,calc(100vw-1.5rem))] overflow-hidden bg-popover text-popover-foreground ring-1 ring-border dark:ring-white/[0.14]"
         >
           <motion.div
             initial={false}
@@ -615,7 +585,7 @@ function CommandRow({
       onPointerDown={(event) => event.preventDefault()}
       onPointerEnter={onActivate}
       onClick={onSelect}
-      className={`flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13.5px]/5 transition-colors duration-100 disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-left text-[13.5px]/5 transition-colors duration-100 disabled:cursor-not-allowed disabled:opacity-50 ${
         active && !command.disabled
           ? "bg-accent text-accent-foreground"
           : ""

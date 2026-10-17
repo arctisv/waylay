@@ -56,7 +56,7 @@ title.textContent=String(t.title==null?'':t.title);
 row.appendChild(title);list.appendChild(row);
 });
 }else{
-var bone=function(c,w,o){var d=document.createElement('div');d.className='rounded-md bg-muted '+c;if(w)d.style.width=w;if(o)d.style.opacity=o;return d};
+var bone=function(c,w,o){var d=document.createElement('div');d.className='bg-muted '+c;if(w)d.style.width=w;if(o)d.style.opacity=o;return d};
 var head=make('flex h-5 items-center px-2.5');head.style.animation='';
 head.appendChild(bone('h-3','56px'));el.appendChild(head);
 for(var i=0;i<5;i++){var r=document.createElement('div');r.className='flex h-8 shrink-0 items-center px-2.5';

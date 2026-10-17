@@ -43,7 +43,7 @@ export function HistoryView() {
                 <button
                   type="button"
                   aria-label="Search chats"
-                  className="flex size-10 cursor-pointer items-center justify-center rounded-full text-foreground-soft transition-[background-color,scale] duration-150 active:scale-[0.94] active:bg-accent-pressed"
+                  className="flex size-10 cursor-pointer items-center justify-center text-foreground-soft transition-[background-color,scale] duration-150 active:scale-[0.94] active:bg-accent-pressed"
                 >
                   <IconSearch size={20} stroke={2} />
                 </button>
@@ -55,7 +55,7 @@ export function HistoryView() {
           type="button"
           aria-label="New chat"
           onClick={openHome}
-          className="flex size-10 cursor-pointer items-center justify-center rounded-full text-foreground-soft transition-[background-color,scale] duration-150 active:scale-[0.94] active:bg-accent-pressed"
+          className="flex size-10 cursor-pointer items-center justify-center text-foreground-soft transition-[background-color,scale] duration-150 active:scale-[0.94] active:bg-accent-pressed"
         >
           <IconPencilPlus size={20} stroke={2} />
         </button>

@@ -33,7 +33,6 @@ function phaseKey(
   thinking: boolean,
 ): string {
   if (!phase) {
-    if (status === "searching") return "searching";
     if (thinking) return "thinking";
     return "spinner";
   }
@@ -66,7 +65,7 @@ export function phaseNarrationTarget({
     return { mode: "hidden", key: "hidden", holdMs: 0 };
   }
 
-  const substantive = Boolean(phase || thinking || status === "searching");
+  const substantive = Boolean(phase || thinking);
   return {
     mode: "live",
     key: `live:${phaseKey(phase, status, thinking)}`,

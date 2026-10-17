@@ -4,7 +4,7 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { useLocalSession, useMutation, useQuery } from "@/lib/local/react";
 
 import { api } from "@/lib/local/api";
-import { CHAT_MODELS, isCustomModelKey } from "@/lib/models";
+import { CHAT_MODELS } from "@/lib/models";
 import { showToast } from "@/lib/toasts";
 
 /* Which models the user pinned into the compact picker. The preset tiers
@@ -23,16 +23,12 @@ const CHANGE_EVENT = "waylay:model-favorites";
 const DEFAULT_KEYS = CHAT_MODELS.map((model) => model.key as string);
 const DEFAULT_SET: ReadonlySet<string> = new Set(DEFAULT_KEYS);
 
-/* Tier keys are pruned against the static lineup; catalog keys (slugs,
-   always with a "/") are kept as-is — the catalog arrives async, so pruning
-   against it here would eat favorites on every load. A slug whose model was
-   deleted just never matches anything. */
+/* Keys are pruned against the lineup, so a model that has since been
+   removed just drops out. */
 function sanitize(value: unknown): string[] | null {
   if (!Array.isArray(value)) return null;
   return value.filter(
-    (key): key is string =>
-      typeof key === "string" &&
-      (DEFAULT_KEYS.includes(key) || isCustomModelKey(key)),
+    (key): key is string => typeof key === "string" && DEFAULT_KEYS.includes(key),
   );
 }
 

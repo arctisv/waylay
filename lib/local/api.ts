@@ -1,4 +1,3 @@
-import * as composerGates from "./backend/composerGates";
 import * as folders from "./backend/folders";
 import * as historySearch from "./backend/historySearch";
 import * as homeSuggestions from "./backend/homeSuggestions";
@@ -16,7 +15,6 @@ import * as userMemory from "./backend/userMemory";
    `useQuery(api.threads.listForCurrentUser)`. Each entry is the definition
    itself, so arguments and results are typed end to end. */
 export const api = {
-  composerGates,
   folders,
   historySearch,
   homeSuggestions,

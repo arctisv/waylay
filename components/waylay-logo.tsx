@@ -20,7 +20,7 @@ export function WaylayLogo({
     >
       <HoverMark
         twirling={twirling}
-        layers={[{ className: "bg-foreground-soft" }]}
+        layers={[{ className: "accent-fill" }]}
       />
     </span>
   );

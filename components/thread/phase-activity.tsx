@@ -166,7 +166,7 @@ export const PhaseActivity = memo(function PhaseActivity({
               setExpanded((currentValue) => !currentValue);
             }}
             aria-expanded={expandable ? expanded : undefined}
-            className={`-mx-1 flex max-w-full items-center rounded-md px-1 py-0.5 text-left ${
+            className={`-mx-1 flex max-w-full items-center px-1 py-0.5 text-left ${
               final ? "gap-1.5" : "gap-2"
             } ${
               expandable

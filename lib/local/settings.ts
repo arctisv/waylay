@@ -6,7 +6,6 @@ import type { LocalDatabase } from "./db";
 export type SettingName =
   | "preferences"
   | "modelFavorites"
-  | "composerGates"
   | "memory"
   | "homeSuggestions"
   | "units"

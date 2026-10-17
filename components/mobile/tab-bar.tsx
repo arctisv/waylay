@@ -75,7 +75,7 @@ export function MobileTabBar() {
             onClick={() => go(tab.key)}
             /* Snaps between tabs rather than gliding a pill along the row:
                a tab bar is a place you land, not a thing you slide. */
-            className={`flex flex-1 cursor-pointer flex-col items-center gap-1 rounded-xl py-1.5 transition-[color,background-color,scale] duration-150 active:scale-[0.94] ${
+            className={`flex flex-1 cursor-pointer flex-col items-center gap-1 py-1.5 transition-[color,background-color,scale] duration-150 active:scale-[0.94] ${
               isActive
                 ? "text-foreground"
                 : "text-foreground-soft active:bg-accent-pressed"

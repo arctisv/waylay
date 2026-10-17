@@ -31,7 +31,6 @@ import { cn } from "@/lib/utils";
 import { useView } from "@/lib/view";
 import { ChatComposer } from "./chat-composer";
 import type { ComposerGates } from "./composer";
-import { HomeFooter } from "./home-footer";
 import { HomeGreeting, HomeSuggestions } from "./home-intro";
 import { IncognitoToggle } from "./incognito-toggle";
 import { QuoteSelectionPopover } from "./quote-selection";
@@ -280,7 +279,6 @@ export function ChatView() {
         text,
         model,
         attachments,
-        search: gates.search,
         thinking: gates.thinking,
         incognito: incognito.enabled,
       });
@@ -317,7 +315,6 @@ export function ChatView() {
         text,
         model,
         attachments,
-        search: gates.search,
         thinking: gates.thinking,
       });
       setComposerDraft("");
@@ -473,11 +470,6 @@ export function ChatView() {
             </AnimatePresence>
           </div>
         </div>
-        {!inThread && (
-          <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-10 hidden md:block">
-            <HomeFooter />
-          </div>
-        )}
       </div>
     </div>
   );
