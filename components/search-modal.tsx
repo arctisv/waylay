@@ -82,7 +82,7 @@ const ResultRow = memo(function ResultRow({
       data-index={index}
       onClick={() => onSelect(thread)}
       onMouseEnter={() => onHover(index)}
-      className={`flex h-9 w-full cursor-pointer items-center gap-2.5 px-2.5 text-[13.5px]/4 [contain-intrinsic-size:auto_36px] [content-visibility:auto] ${
+      className={`flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-xl px-3.5 text-[13.5px]/4 [contain-intrinsic-size:auto_36px] [content-visibility:auto] ${
         active ? "bg-accent text-accent-foreground" : ""
       }`}
     >
@@ -348,9 +348,9 @@ export function SearchModal({
         keepMounted
         backdropClassName="backdrop-blur-xs"
         initialFocus={inputRef}
-        className="top-[16vh] max-w-xl bg-(--popover-translucent) p-0 backdrop-blur-xs duration-100"
+        className="top-[16vh] max-w-xl rounded-[20px] bg-(--popover-translucent) p-1.5 backdrop-blur-xs duration-100"
       >
-        <div className="flex h-12 items-center gap-2.5 border-b border-border px-4">
+        <div className="flex h-11 items-center gap-2.5 rounded-xl bg-black/[0.04] px-3.5 dark:bg-white/[0.06]">
           <IconSearch size={16} className="shrink-0 text-muted-foreground" />
           <input
             ref={inputRef}
@@ -371,7 +371,7 @@ export function SearchModal({
             placeholder="Search threads…"
             className="h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
-          <kbd className="shrink-0 px-1.5 py-0.5 text-xs text-muted-foreground ring-1 ring-border">
+          <kbd className="shrink-0 rounded-sm bg-black/[0.05] px-1.5 py-0.5 text-xs text-muted-foreground dark:bg-white/[0.08]">
             Esc
           </kbd>
         </div>
@@ -387,7 +387,7 @@ export function SearchModal({
         >
           <div
             ref={setBodyEl}
-            className="max-h-80 overflow-y-auto p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="max-h-80 overflow-y-auto pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {flat.length === 0 && !showDeepNotice ? (
               <div className="flex h-16 items-center justify-center text-sm text-muted-foreground">
@@ -401,7 +401,7 @@ export function SearchModal({
               <>
               {groups.map(([label, items]) => (
                 <section key={label}>
-                  <div className="flex h-7 items-end px-2.5 pb-1 text-xs font-medium text-muted-foreground">
+                  <div className="flex h-7 items-end px-3.5 pb-1 text-xs font-medium text-muted-foreground">
                     {label}
                   </div>
                   {items.map((thread) => {
@@ -431,7 +431,7 @@ export function SearchModal({
                   each with a glimpse of the line that did it. */}
               {deepMatches.length > 0 && (
                 <motion.section {...POP_IN}>
-                  <div className="flex h-7 items-end px-2.5 pb-1 text-xs font-medium text-muted-foreground">
+                  <div className="flex h-7 items-end px-3.5 pb-1 text-xs font-medium text-muted-foreground">
                     Found in messages
                   </div>
                   {deepMatches.map(({ thread, excerpt }) => {

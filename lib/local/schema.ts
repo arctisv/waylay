@@ -27,8 +27,6 @@ export type AttachmentRow = {
   /** The file's text, read in the browser. Model context only. */
   text?: string;
   skippedReason?: string;
-  /** The bytes, for pictures painted on this device. */
-  data?: Blob;
 };
 
 export type MessageRow = {

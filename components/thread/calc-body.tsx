@@ -39,7 +39,7 @@ export function CalcBody({ phase }: { phase: MessagePhase }) {
   const items = (phase.items ?? []).filter(isCalcItem);
   if (items.length) {
     return (
-      <div className="divide-y divide-border">
+      <div className="flex flex-col">
         {items.map((item, index) => (
           <div key={`${item.expression}-${index}`} className="flex items-baseline justify-between gap-4 py-2">
             <span className="flex min-w-0 flex-wrap items-baseline gap-2">

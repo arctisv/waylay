@@ -1,24 +1,31 @@
-import { IMAGE_MODEL } from "@/lib/local/inference/image-engine";
-import { LOCAL_MODELS } from "@/lib/local/inference/models";
+"use client";
+
+import { useMemo } from "react";
+
+import { useDeviceSupport } from "@/lib/local/device/support";
+import { findModel, runsOn } from "@/lib/local/inference/models";
 import { CHAT_MODELS, type ComposerModel } from "@/lib/models";
 
-/* What the picker renders: the fixed lineup, each tier wearing the name
-   and maker of the model it downloads (lib/local/inference/models.ts) so
-   search and the catalog list can say what actually runs. */
-const COMPOSER_MODELS: ComposerModel[] = CHAT_MODELS.map((model) => {
-  const local =
-    model.key === "Auto"
-      ? null
-      : model.key === "Image"
-        ? IMAGE_MODEL
-        : LOCAL_MODELS[model.key];
-  return {
-    ...model,
-    company: local?.company,
-    fullName: local ? `${model.name} · ${local.label}` : undefined,
-  };
-});
-
+/* What the picker offers on this device: Auto plus every model with a
+   build that runs here, each wearing its download size for this device.
+   Until the device check answers, the GPU lineup stands in. */
 export function useComposerModels(): ComposerModel[] {
-  return COMPOSER_MODELS;
+  const support = useDeviceSupport();
+  const cpu = support.backend === "cpu";
+  const f16 = support.status !== "ready" || Boolean(support.specs.shaderF16);
+
+  return useMemo(() => {
+    const device = {
+      status: "ready" as const,
+      backend: cpu ? ("cpu" as const) : ("webgpu" as const),
+      specs: { webgpu: !cpu, shaderF16: f16 },
+    };
+    return CHAT_MODELS.flatMap((model) => {
+      const local = findModel(model.key);
+      if (!local) return [model];
+      if (!runsOn(local, device)) return [];
+      const downloadMB = cpu ? local.cpu?.downloadMB : local.gpu?.downloadMB;
+      return [{ ...model, downloadMB }];
+    });
+  }, [cpu, f16]);
 }

@@ -78,7 +78,6 @@ export function scoreText(haystack: string, query: string): number {
 
 /** What you read on the row outranks what you don't. */
 const NAME_WEIGHT = 1;
-const FULL_NAME_WEIGHT = 0.98;
 const COMPANY_WEIGHT = 0.8;
 const ALIAS_WEIGHT = 0.75;
 
@@ -91,8 +90,7 @@ export function scoreModel(model: ComposerModel, query: string): number {
   };
 
   consider(model.name, NAME_WEIGHT);
-  consider(model.fullName, FULL_NAME_WEIGHT);
-  consider(model.company, COMPANY_WEIGHT);
+  consider(model.maker, COMPANY_WEIGHT);
   for (const alias of model.aliases) consider(alias, ALIAS_WEIGHT);
 
   return best;

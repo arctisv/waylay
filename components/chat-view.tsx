@@ -25,6 +25,7 @@ import {
   type ChatMessage,
 } from "@/lib/messages";
 import { useModelPref } from "@/lib/model-pref";
+import { lineupKey } from "@/lib/models";
 import { EASE_OUT, pinRasterPath, SHED_BLUR } from "@/lib/motion";
 import { runMutation as run, showToast } from "@/lib/toasts";
 import { cn } from "@/lib/utils";
@@ -181,7 +182,7 @@ export function ChatView() {
       adoptedThreadModelRef.current = { threadId: forThreadId, model };
       /* Wearing a thread's model isn't picking one — it rides the composer
          for this visit, then reads back as Auto (lib/model-pref.ts). */
-      if (model) setModelRef.current(model, { explicit: false });
+      if (model) setModelRef.current(lineupKey(model), { explicit: false });
     },
     [],
   );

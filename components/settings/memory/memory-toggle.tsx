@@ -15,7 +15,7 @@ export function MemoryToggle() {
   const setEnabled = useMutation(api.memory.setMemoryEnabled);
 
   if (settings === undefined) {
-    return <Skeleton className="h-4.5 w-8"/>;
+    return <Skeleton className="h-4.5 w-8 rounded-full" />;
   }
 
   const toggle = async (next: boolean) => {

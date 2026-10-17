@@ -18,7 +18,7 @@ import {
   writeThreadMessageCache,
 } from "./message-cache";
 import { reconcileMessageIdentities } from "./message-identity";
-import { CHAT_MODELS, type ThinkingLevel } from "./models";
+import { lineupKey, lineupModel, type ThinkingLevel } from "./models";
 
 /* The chat data layer: sending, subscribing, stopping, retrying. The
    protocol (see lib/local/backend/messages.ts): sendUserMessage writes the
@@ -36,7 +36,6 @@ export type MessageAttachment = {
   name: string;
   size: number;
   type: string;
-  url?: string;
   text?: string;
   skippedReason?: string;
 };
@@ -321,14 +320,11 @@ export type SendMessageArgs = {
 };
 
 /* Anything that isn't a model in the lineup folds to Auto. */
-function wireModel(model: string): string {
-  return CHAT_MODELS.find((entry) => entry.key === model)?.key ?? "Auto";
-}
+const wireModel = lineupKey;
 
 /* Only a model that can think gets a thinking turn. */
 function wireThinking(model: string, thinking: ThinkingLevel): boolean {
-  const entry = CHAT_MODELS.find((candidate) => candidate.key === wireModel(model));
-  return thinking !== "none" && Boolean(entry?.thinkingLevels.includes(thinking));
+  return thinking !== "none" && lineupModel(model).thinkingLevels.includes(thinking);
 }
 
 export function useMessageActions() {

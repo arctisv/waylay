@@ -11,9 +11,7 @@ import {
   IconBrain,
   IconCheck,
   IconChevronRight,
-  IconEyeFilled,
-  IconFileFilled,
-  IconPhotoFilled,
+  IconCode,
   IconSearch,
   IconStar,
   IconStarFilled,
@@ -32,6 +30,7 @@ import { useModelFavorites } from "@/lib/model-favorites";
 import type { SetModelPref } from "@/lib/model-pref";
 import { searchModels } from "@/lib/model-search";
 import {
+  formatDownload,
   THINKING_LABELS,
   type ComposerModel,
   type ThinkingLevel,
@@ -92,7 +91,7 @@ const GATE = {
 } as const;
 
 const ROW =
-  "flex w-full cursor-pointer items-center gap-2 px-2 py-1 text-left text-[13.5px]/5 transition-colors duration-100 hover:bg-accent hover:text-accent-foreground";
+  "flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-left text-[13.5px]/5 transition-colors duration-100 hover:bg-accent hover:text-accent-foreground";
 
 function CapabilityIcon({
   label,
@@ -111,35 +110,28 @@ function CapabilityIcon({
   );
 }
 
-/* The capability strip under a model's name: one pill of tiny marks
-   (vision, files, thinking, image output). A model that earns no marks
-   gets no pill — an empty one reads as a rendering glitch. */
+/* The strip under a model's name in the catalog: its download for this
+   device, then a pill of tiny marks for what it's good at (thinking,
+   code). A model that earns no marks gets no pill. */
 function ModelTags({ model }: { model: ComposerModel }) {
   const thinks = model.thinkingLevels.some((level) => level !== "none");
-  const hasMarks = model.vision || model.files || thinks || model.imageOutput;
-  if (!hasMarks) return null;
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      {hasMarks && (
-        <span className="flex h-5 items-center gap-1.5 bg-black/[0.05] px-2 text-muted-foreground dark:bg-white/[0.06]">
-          {model.vision && (
-            <CapabilityIcon label="Sees images">
-              <IconEyeFilled size={12} />
-            </CapabilityIcon>
-          )}
-          {model.files && (
-            <CapabilityIcon label="Reads files">
-              <IconFileFilled size={12} />
-            </CapabilityIcon>
-          )}
+    <div className="flex flex-wrap items-center gap-1.5 text-[11.5px]/4 text-muted-foreground">
+      {model.downloadMB !== undefined && (
+        <span className="tabular-nums">{formatDownload(model.downloadMB)}</span>
+      )}
+      {(thinks || model.code) && (
+        <span className="flex h-5 items-center gap-1.5 rounded-full bg-black/[0.05] px-2 dark:bg-white/[0.06]">
           {thinks && (
-            <CapabilityIcon label="Can think">
+            <CapabilityIcon
+              label={model.thinkingLevels.includes("none") ? "Can think" : "Always thinks"}
+            >
               <IconBrain size={12} stroke={2.5} />
             </CapabilityIcon>
           )}
-          {model.imageOutput && (
-            <CapabilityIcon label="Makes images">
-              <IconPhotoFilled size={12} />
+          {model.code && (
+            <CapabilityIcon label="Made for code">
+              <IconCode size={12} stroke={2.5} />
             </CapabilityIcon>
           )}
         </span>
@@ -177,13 +169,14 @@ export function ModelSelect({
   /* The catalog scroller's dissolving edges — same treatment as the
      sidebar's thread list, fading from the popover surface. */
   const { scrollRef, onScroll, fades } = useScrollFades();
-  /* Every model the picker offers. models[0] is Auto — the fallback when
-     a saved pick no longer exists. */
+  /* Every model this device can run. models[0] is Auto — the fallback
+     when a saved pick doesn't run here. */
   const models = useComposerModels();
   const current = models.find((model) => model.key === value) ?? models[0];
 
-  /* Keep the thinking level on the current model's wheel — Heavy has no
-     "none", Image has nothing else. Shared with the send path
+  /* Keep the thinking level on the current model's wheel — a model that
+     always thinks has no "none", most have nothing else. Shared with the
+     send path
      (lib/composer-gates.ts), so the chip never shows a state the request
      wouldn't carry. */
   const levels = current.thinkingLevels;
@@ -253,7 +246,7 @@ export function ModelSelect({
     >
       <PopoverTrigger
         aria-label="Choose model"
-        className="relative flex h-9 shrink-0 cursor-pointer items-center px-3 text-[13.5px]/4 font-medium text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground data-popup-open:bg-black/[0.05] data-popup-open:text-foreground dark:hover:bg-white/[0.06] dark:data-popup-open:bg-white/[0.06]"
+        className="relative flex h-9 shrink-0 cursor-pointer items-center rounded-full px-3 text-[13.5px]/4 font-medium text-muted-foreground transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground data-popup-open:bg-black/[0.05] data-popup-open:text-foreground dark:hover:bg-white/[0.06] dark:data-popup-open:bg-white/[0.06]"
       >
         {/* The width twin: identical content at rest pose, never visible. */}
         <span
@@ -362,7 +355,7 @@ export function ModelSelect({
                         the model's levels. Locked and single-level models
                         keep the plain label instead of a dead track. */}
                     <div
-                      className={`flex w-full items-center justify-between gap-2 px-2 py-1 text-left text-[13.5px]/5 ${
+                      className={`flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1 text-left text-[13.5px]/5 ${
                         gatesLocked || levels.length < 2
                           ? "opacity-50"
                           : ""
@@ -391,17 +384,17 @@ export function ModelSelect({
                     </div>
                   </div>
                 ) : (
-                  <div className="p-1.5">
+                  <div className="p-1">
                     <button
                       type="button"
                       onClick={() => setView("small")}
-                      className="flex cursor-pointer items-center gap-1.5 px-1.5 py-1 text-[13.5px]/4 font-medium text-muted-foreground transition-colors duration-100 hover:text-foreground"
+                      className="flex cursor-pointer items-center gap-1.5 rounded-lg px-1.5 py-1 text-[13.5px]/4 font-medium text-muted-foreground transition-colors duration-100 hover:text-foreground"
                     >
                       <IconArrowLeft size={14} className="shrink-0" />
                       Back
                     </button>
                     <div className="mt-1.5 mb-1 flex items-center gap-1.5">
-                      <div className="flex h-8 min-w-0 flex-1 items-center gap-2 bg-well px-3 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
+                      <div className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-full bg-well px-3">
                         <IconSearch
                           size={15}
                           className="shrink-0 text-muted-foreground"
@@ -492,7 +485,7 @@ function CatalogRow({
       <button
         type="button"
         onClick={onSelect}
-        className="flex w-full cursor-pointer flex-col gap-1 px-2 py-1.5 pr-10 text-left transition-colors duration-100 hover:bg-accent"
+        className="flex w-full cursor-pointer flex-col gap-1 rounded-lg px-2 py-1.5 pr-10 text-left transition-colors duration-100 hover:bg-accent"
       >
         <span className="flex items-center gap-2 text-[13.5px]/5 font-medium">
           <ModelGlyph
@@ -500,12 +493,17 @@ function CatalogRow({
             size={15}
             className="shrink-0 text-muted-foreground"
           />
-          <span className="truncate">{model.fullName ?? model.name}</span>
+          <span className="truncate">{model.name}</span>
           {selected && (
             <IconCheck size={14} className="shrink-0 text-muted-foreground" />
           )}
         </span>
-        <ModelTags model={model} />
+        <span className="truncate pl-[23px] text-[12.5px]/4 text-muted-foreground">
+          {model.blurb}
+        </span>
+        <span className="pl-[23px]">
+          <ModelTags model={model} />
+        </span>
       </button>
       <button
         type="button"
@@ -516,7 +514,7 @@ function CatalogRow({
         }
         aria-pressed={favorite}
         onClick={onToggleFavorite}
-        className="absolute top-1.5 right-1.5 flex size-6 cursor-pointer items-center justify-center text-muted-foreground transition-[background-color,color,scale] duration-150 hover:bg-black/[0.05] hover:text-foreground active:scale-90 dark:hover:bg-white/[0.06]"
+        className="absolute top-1 right-1 flex size-6 cursor-pointer items-center justify-center rounded-sm text-muted-foreground transition-[background-color,color,scale] duration-150 hover:bg-black/[0.05] hover:text-foreground active:scale-90 dark:hover:bg-white/[0.06]"
       >
         {favorite ? <IconStarFilled size={14} /> : <IconStar size={14} />}
       </button>

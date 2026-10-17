@@ -132,7 +132,7 @@ function buildCommands(
     ctx.models.find((model) => model.key === ctx.model) ?? ctx.models[0];
 
   /* At rest: the user's pinned models (the picker's compact list, same
-     fallback to the preset tiers when nothing's starred). Searching: every
+     fallback to the whole lineup when nothing's starred). Searching: every
      model. */
   const pinned = ctx.models.filter((model) => ctx.favorites.has(model.key));
   const restingModels = pinned.length > 0 ? pinned : ctx.models;
@@ -140,7 +140,7 @@ function buildCommands(
 
   const modelCommands: Command[] = modelPool.map((model) => ({
     id: `model:${model.key}`,
-    label: model.fullName ?? model.name,
+    label: model.name,
     glyph: (
       <ModelGlyph
         model={model}
@@ -148,7 +148,7 @@ function buildCommands(
         className="shrink-0 text-muted-foreground"
       />
     ),
-    keywords: ["model", "switch", ...model.aliases],
+    keywords: ["model", "switch", ...(model.maker ? [model.maker] : []), ...model.aliases],
     selected: ctx.model === model.key,
     onSelect: () => ctx.setModel(model.key),
   }));
@@ -158,7 +158,11 @@ function buildCommands(
   const levels = current?.thinkingLevels ?? ["none"];
   const level = clampThinking(current, ctx.thinking);
   const gateDisabledHint =
-    current?.key === "Auto" ? "Auto decides" : "Not on this model";
+    current?.key === "Auto"
+      ? "Auto decides"
+      : levels[0] === "high"
+        ? "Always thinks"
+        : "Not on this model";
   const thinkingHint = gatesLocked
     ? current?.key === "Auto"
       ? "Auto"
@@ -499,7 +503,7 @@ export function useComposerCommandMenu({
           {...POP}
           role="menu"
           aria-label="Composer commands"
-          className="raised absolute bottom-full left-0 z-40 mb-2 w-[min(20rem,calc(100vw-1.5rem))] overflow-hidden bg-popover text-popover-foreground ring-1 ring-border dark:ring-white/[0.14]"
+          className="raised absolute bottom-full left-0 z-40 mb-2 w-[min(20rem,calc(100vw-1.5rem))] overflow-hidden rounded-xl bg-popover text-popover-foreground"
         >
           <motion.div
             initial={false}
@@ -585,7 +589,7 @@ function CommandRow({
       onPointerDown={(event) => event.preventDefault()}
       onPointerEnter={onActivate}
       onClick={onSelect}
-      className={`flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-left text-[13.5px]/5 transition-colors duration-100 disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13.5px]/5 transition-colors duration-100 disabled:cursor-not-allowed disabled:opacity-50 ${
         active && !command.disabled
           ? "bg-accent text-accent-foreground"
           : ""

@@ -21,27 +21,18 @@ export function assistantActivityState({
   terminal,
   canShowActivity,
   showText,
-  richerActivityWorking,
 }: {
   phases: MessagePhase[];
   terminal: boolean;
   canShowActivity: boolean;
   showText: boolean;
-  richerActivityWorking: boolean;
 }): {
   active: boolean;
   settled: boolean;
 } {
   const compact = phases.filter(isCompactPhase);
-  const compactWorking = compact.some((phase) => phase.pending);
-  const compactTurnInProgress = compact.length > 0 && !richerActivityWorking;
-
   return {
-    active:
-      canShowActivity &&
-      (compactWorking ||
-        compactTurnInProgress ||
-        (!showText && !richerActivityWorking)),
+    active: canShowActivity && (compact.length > 0 || !showText),
     settled: terminal || (showText && compact.length === 0),
   };
 }

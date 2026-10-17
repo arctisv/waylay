@@ -1,6 +1,5 @@
-"""Writes Waylay's mark: eight square tiles on a circle, growing from a
-small tile at the top to the largest just before it, each turned to face the
-center. Run `python3 scripts/generate-mark.py && npm run icons` after
+"""Writes Waylay's mark: eight round dots on a circle, growing from a small
+dot at the top to the largest just before it. Run `python3 scripts/generate-mark.py && npm run icons` after
 changing it. Outputs the static mark, its mask layers, the favicon and the
 animated version used for hovers and the activity spinner."""
 
@@ -24,11 +23,7 @@ def tiles():
 
 
 def tile(angle, size, x, y, extra=""):
-    half = size / 2
-    return (
-        f'<rect{extra} x="{x - half:.2f}" y="{y - half:.2f}" width="{size:.2f}" '
-        f'height="{size:.2f}" transform="rotate({angle + 90:.1f} {x:.2f} {y:.2f})"/>'
-    )
+    return f'<circle{extra} cx="{x:.2f}" cy="{y:.2f}" r="{size / 2:.2f}"/>'
 
 
 HEAD = '<svg width="180" height="182" viewBox="0 0 180 182" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
@@ -45,9 +40,8 @@ static = "".join(f"  {tile(a, s, x, y)}\n" for _, a, s, x, y in tiles())
     + "</g>\n</svg>\n"
 )
 
-# Animated: each tile does a quarter turn and steps outward, in a cascade
-# around the ring, then the mark rests. A quarter turn lands a square on
-# itself, so the loop is seamless.
+# Animated: each dot swells and steps outward, in a cascade around the
+# ring, then the mark rests.
 rules = "\n".join(
     f"    .t{index} {{ animation-delay: {index * 0.045:.3f}s; }}" for index, *_ in tiles()
 )
@@ -64,9 +58,9 @@ animated = f'''<svg width="240" height="242" viewBox="-30 -30 240 242" fill="non
       animation: turn 2.4s cubic-bezier(0.55, 0, 0.3, 1) infinite;
     }}
     @keyframes turn {{
-      0% {{ translate: 0 0; rotate: 0deg; scale: 1; }}
-      30% {{ translate: var(--dx) var(--dy); rotate: 45deg; scale: 1.18; }}
-      60%, 100% {{ translate: 0 0; rotate: 90deg; scale: 1; }}
+      0% {{ translate: 0 0; scale: 1; }}
+      30% {{ translate: var(--dx) var(--dy); scale: 1.18; }}
+      60%, 100% {{ translate: 0 0; scale: 1; }}
     }}
 {rules}
   </style>

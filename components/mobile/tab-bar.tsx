@@ -61,7 +61,7 @@ export function MobileTabBar() {
   return (
     <nav
       aria-label="Sections"
-      className="mobile-tab-bar flex shrink-0 items-stretch gap-1 border-t border-border bg-background px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] md:hidden"
+      className="mobile-tab-bar flex shrink-0 items-stretch gap-1 bg-background px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] md:hidden"
     >
       {TABS.map((tab) => {
         if (tab.key === "history" && incognito) return null;
@@ -75,7 +75,7 @@ export function MobileTabBar() {
             onClick={() => go(tab.key)}
             /* Snaps between tabs rather than gliding a pill along the row:
                a tab bar is a place you land, not a thing you slide. */
-            className={`flex flex-1 cursor-pointer flex-col items-center gap-1 py-1.5 transition-[color,background-color,scale] duration-150 active:scale-[0.94] ${
+            className={`flex flex-1 cursor-pointer flex-col items-center gap-1 rounded-xl py-1.5 transition-[color,background-color,scale] duration-150 active:scale-[0.94] ${
               isActive
                 ? "text-foreground"
                 : "text-foreground-soft active:bg-accent-pressed"

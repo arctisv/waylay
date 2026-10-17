@@ -11,20 +11,6 @@ import type { AttachmentRow, MessageRow, SendOptions } from "../schema";
 import { requireThread, threadMessages } from "../threads";
 import type { MessagePhase, MessageStatus } from "./types";
 
-/* One object URL per stored picture, made once and kept for the tab's life
-   so a re-render never swaps the image out from under its <img>. */
-const objectUrls = new Map<string, string>();
-
-function urlFor(attachment: AttachmentRow): string | undefined {
-  if (!attachment.data) return undefined;
-  let url = objectUrls.get(attachment.id);
-  if (!url) {
-    url = URL.createObjectURL(attachment.data);
-    objectUrls.set(attachment.id, url);
-  }
-  return url;
-}
-
 function formatMessage(message: MessageRow) {
   return {
     id: message._id,
@@ -32,13 +18,12 @@ function formatMessage(message: MessageRow) {
     content: message.content,
     createdAt: message.createdAt,
     /* The file text stays in the database for the model; the screens only
-       need the chip, or the picture. */
+       need the chip. */
     attachments: message.attachments?.map((attachment) => ({
       id: attachment.id,
       name: attachment.name,
       size: attachment.size,
       type: attachment.type,
-      url: urlFor(attachment),
     })),
     status: message.status,
     phases: message.phases,
@@ -101,9 +86,7 @@ export const sendUserMessage = mutation(
           })
         : ctx.db.insert("threads", {
             title: fallbackTitleFromPrompt(titlePromptInput(content)),
-            /* A picture chat keeps its prompt as the title: naming it would
-               mean swapping the picture model out for a text one. */
-            titleStatus: model === "Image" ? "ready" : "generating",
+            titleStatus: "generating",
             createdAt: now,
             updatedAt: now,
             model,

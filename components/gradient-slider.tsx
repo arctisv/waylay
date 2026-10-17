@@ -74,16 +74,19 @@ export function GradientSlider({
         onChange(Math.min(1, Math.max(0, value + delta)));
       }}
       style={{ background: trackBackground }}
-      className="relative h-4 w-full cursor-pointer touch-none shadow-[inset_0_0_0_1px_var(--well-outline)] outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group relative h-4 w-full cursor-pointer touch-none rounded-full outline-none"
     >
       <span
         aria-hidden
         style={{
           left: `calc(10px + ${value} * (100% - 20px))`,
-          background: thumbColor,
         }}
-        className="absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 border-2 border-surface shadow-[0_0_0_1px_var(--well-outline)]"
-      />
+        className="absolute top-1/2 flex size-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-surface transition-[scale] duration-150 group-focus-visible:scale-120"
+      >
+        {/* A disc of the picked color on a surface-filled thumb: it reads
+            on any stretch of the track without an outline. */}
+        <span className="size-3 rounded-full" style={{ background: thumbColor }} />
+      </span>
     </div>
   );
 }

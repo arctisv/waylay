@@ -183,7 +183,7 @@ export function ThreadList({ onNavigate }: { onNavigate?: () => void }) {
       /* invisible (not hidden) when collapsed: it fades under the sliding
          rail edge instead of vanishing a frame before the width moves, and
          visibility still drops it from the a11y tree and hit-testing. */
-      className={`relative -mx-3 min-h-0 flex-1 transition-[background-color,opacity,visibility] duration-150 sidebar-collapsed:invisible sidebar-collapsed:opacity-0 ${
+      className={`relative -mx-3 min-h-0 flex-1 rounded-lg transition-[background-color,opacity,visibility] duration-150 sidebar-collapsed:invisible sidebar-collapsed:opacity-0 ${
         unfileOver ? "bg-black/[0.04] dark:bg-white/[0.04]" : ""
       }`}
       onDragOver={(event) => {

@@ -33,7 +33,7 @@ export function AttachMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Attach files or dictate"
-        className="raised group flex size-9 shrink-0 cursor-pointer items-center justify-center border border-border bg-surface text-muted-foreground transition-[background-color,color,scale] duration-150 hover:text-foreground data-popup-open:text-foreground active:scale-95"
+        className="group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-surface text-muted-foreground transition-[background-color,color,scale] duration-150 hover:text-foreground data-popup-open:text-foreground active:scale-95"
       >
         <IconPlus
           size={18}

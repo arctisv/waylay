@@ -9,7 +9,7 @@ export function RowPill({ className = "" }: { className?: string }) {
   return (
     <span
       aria-hidden
-      className={`absolute inset-0 transition-[background-color] duration-150 ease-out group-hover/row:bg-accent group-active/row:bg-accent-pressed ${className}`}
+      className={`absolute inset-0 rounded-lg transition-[background-color] duration-150 ease-out group-hover/row:bg-accent group-active/row:bg-accent-pressed ${className}`}
     />
   );
 }

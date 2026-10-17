@@ -1,6 +1,6 @@
 // Renders the app icons and the social card from the mark in
-// public/brand/mark.svg: the white mark on Waylay's accent — a black-to-blue
-// gradient under a film of grain, the same recipe as app/accents.css.
+// public/brand/mark.svg: the white mark on Waylay's blue (--primary in
+// app/globals.css).
 // Run with `npm run icons` after changing the mark, then commit the output.
 import { readFile, writeFile } from "node:fs/promises";
 import sharp from "sharp";
@@ -13,20 +13,11 @@ const mark = (await readFile(path("public/brand/mark.svg"), "utf8")).replaceAll(
   "white",
 );
 
-/** The accent canvas at any size: the light-mode gradient plus grain. */
+/** The accent canvas at any size. */
 function canvas(width, height) {
   return Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-      <defs>
-        <linearGradient id="a" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#09090b"/>
-          <stop offset="0.52" stop-color="#0c1c52"/>
-          <stop offset="1" stop-color="#2563eb"/>
-        </linearGradient>
-        <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#a)"/>
-      <rect width="100%" height="100%" filter="url(#g)" opacity="0.12"/>
+      <rect width="100%" height="100%" fill="#2669ed"/>
     </svg>`,
   );
 }

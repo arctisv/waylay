@@ -1,4 +1,4 @@
-import type { LocalModel } from "./models";
+import type { ToolStyle } from "./models";
 
 /* The system prompt. Small models follow short, concrete rules far better
    than long ones, so this is Whirl's personality pared down to what a 1-3B
@@ -6,7 +6,8 @@ import type { LocalModel } from "./models";
    the date, the person's own instructions, and what Waylay remembers. */
 
 export type PromptContext = {
-  family: LocalModel["family"];
+  /** How the model calls tools; null for models that weren't trained to. */
+  tools: ToolStyle;
   /** Free-text "how should Waylay respond" from Personalization. */
   preferences: string | null;
   memories: string[];
@@ -138,8 +139,10 @@ export function buildSystemPrompt(context: PromptContext): string {
     );
   }
 
-  const tools = toolsFor(context);
-  sections.push(context.family === "qwen" ? qwenTools(tools) : llamaTools(tools));
+  if (context.tools) {
+    const tools = toolsFor(context);
+    sections.push(context.tools === "qwen" ? qwenTools(tools) : llamaTools(tools));
+  }
   return sections.join("\n\n");
 }
 

@@ -11,6 +11,7 @@ import { showToast } from "@/lib/toasts";
 import type { Memory } from "@/lib/user-memory";
 import { ArmRemoveButton } from "../arm-remove-button";
 import { MemoryTextarea } from "./memory-textarea";
+import { SETTINGS_TILE } from "../settings-rows";
 
 /* One remembered fact. Reads as plain text until you edit it, at which point
    the row unfolds into the same field the add form uses — the settings
@@ -61,7 +62,7 @@ export function MemoryRow({
 
   if (editing) {
     return (
-      <li className="flex flex-col gap-2 px-4 py-3">
+      <li className={`flex flex-col gap-2 p-3 ${SETTINGS_TILE}`}>
         <MemoryTextarea
           value={draft}
           onChange={setDraft}
@@ -95,7 +96,7 @@ export function MemoryRow({
   const stamp = memory.updatedAt ? formatRelative(memory.updatedAt) : null;
 
   return (
-    <li className="flex items-start gap-3 px-4 py-3">
+    <li className={`flex items-start gap-3 px-4 py-3 ${SETTINGS_TILE}`}>
       <div className="min-w-0 flex-1">
         <p className="text-[13px]/[19px] break-words">{memory.memory}</p>
         {(memory.isStatic || stamp) && (

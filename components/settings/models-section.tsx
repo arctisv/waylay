@@ -7,7 +7,7 @@ import { ModelGlyph } from "@/components/model-glyph";
 import { useComposerModels } from "@/lib/model-catalog";
 import { useModelFavorites } from "@/lib/model-favorites";
 import { searchModels } from "@/lib/model-search";
-import type { ComposerModel } from "@/lib/models";
+import { modelDetails, type ComposerModel } from "@/lib/models";
 import { ToggleSwitch } from "../toggle-switch";
 import {
   SettingsCard,
@@ -15,20 +15,6 @@ import {
   SettingsRow,
   SettingsSearchRow,
 } from "./settings-rows";
-
-function capabilityBlurb(model: ComposerModel): string {
-  const bits = [
-    model.imageOutput ? "paints pictures" : null,
-    model.vision ? "sees images" : null,
-    model.files ? "reads files" : null,
-    model.thinkingLevels.some((level) => level !== "none")
-      ? "can think hard"
-      : null,
-  ].filter((bit): bit is string => bit !== null);
-
-  const blurb = bits.join(" · ");
-  return blurb.charAt(0).toUpperCase() + blurb.slice(1);
-}
 
 export function ModelsSection() {
   const models = useComposerModels();
@@ -46,8 +32,8 @@ export function ModelsSection() {
     <SettingsRow
       key={model.key}
       iconNode={<ModelGlyph model={model} size={18} />}
-      title={model.fullName ?? model.name}
-      description={capabilityBlurb(model)}
+      title={model.name}
+      description={modelDetails(model)}
       control={
         <ToggleSwitch
           checked={favorites.has(model.key)}

@@ -75,7 +75,7 @@ function RoundButton({
         aria-label={label}
         onClick={onClick}
         disabled={disabled}
-        className="size-9 shrink-0 justify-center p-0 transition-[background-color,scale,opacity] disabled:pointer-events-none disabled:opacity-40"
+        className="size-9 shrink-0 justify-center rounded-full p-0 transition-[background-color,scale,opacity] disabled:pointer-events-none disabled:opacity-40"
       >
         {children}
       </SquishButton>
@@ -90,7 +90,7 @@ function RoundButton({
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="raised flex size-9 shrink-0 cursor-pointer items-center justify-center border border-border bg-surface text-muted-foreground transition-[background-color,color,scale] duration-150 hover:text-foreground active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+      className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-surface text-muted-foreground transition-[background-color,color,scale] duration-150 hover:text-foreground active:scale-95 disabled:pointer-events-none disabled:opacity-40"
     >
       {children}
     </button>
@@ -161,7 +161,7 @@ export function VoiceFace({ voice }: { voice: VoiceInput }) {
               <button
                 type="button"
                 onClick={cancel}
-                className="cursor-pointer border border-border bg-surface px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-[background-color,color,scale] duration-150 hover:text-foreground active:scale-[0.97]"
+                className="cursor-pointer rounded-full bg-surface px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-[background-color,color,scale] duration-150 hover:text-foreground active:scale-[0.97]"
               >
                 Close
               </button>
@@ -170,7 +170,7 @@ export function VoiceFace({ voice }: { voice: VoiceInput }) {
               {status !== "denied" && (
                 <SquishButton
                   onClick={grant}
-                  className="px-3.5 py-1.5"
+                  className="rounded-full px-3.5 py-1.5"
                 >
                   Try again
                 </SquishButton>
@@ -188,7 +188,7 @@ export function VoiceFace({ voice }: { voice: VoiceInput }) {
               type="button"
               aria-label="Cancel voice input"
               onClick={cancel}
-              className="absolute top-0 right-0 flex size-8 cursor-pointer items-center justify-center text-muted-foreground transition-[background-color,color,scale] duration-150 hover:bg-accent hover:text-foreground active:scale-95"
+              className="absolute top-0 right-0 flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-[background-color,color,scale] duration-150 hover:bg-accent hover:text-foreground active:scale-95"
             >
               <IconX size={16} stroke={2.2} />
             </button>
@@ -201,7 +201,7 @@ export function VoiceFace({ voice }: { voice: VoiceInput }) {
                   : { type: "spring", stiffness: 400, damping: 26 }
               }
               transformTemplate={pinRasterPath}
-              className="flex size-14 items-center justify-center bg-accent text-foreground-soft"
+              className="flex size-14 items-center justify-center rounded-full bg-accent text-foreground-soft"
             >
               <IconMicrophoneFilled size={26} />
             </motion.div>
@@ -222,7 +222,7 @@ export function VoiceFace({ voice }: { voice: VoiceInput }) {
               </p>
             </div>
             {status !== "requesting" && (
-              <SquishButton onClick={grant} className="px-4 py-1.5">
+              <SquishButton onClick={grant} className="rounded-full px-4 py-1.5">
                 Allow microphone
               </SquishButton>
             )}

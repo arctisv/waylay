@@ -1,18 +1,13 @@
 import {
-  IconBarbellFilled,
-  IconBoltFilled,
-  IconPhotoFilled,
-  IconSparklesFilled,
-  type Icon,
-} from "@tabler/icons-react";
+  findModel,
+  LOCAL_MODELS,
+  type LocalModel,
+  type Maker,
+} from "@/lib/local/inference/models";
 
-import { IconBrainFilled } from "@/components/icons/brain-filled";
-
-/* The model lineup for the composer's picker. Every one runs on this
-   device (lib/local/inference/models.ts maps each key to its download);
-   the keys are what gets saved with a chat, so never rename them. */
-
-export type ChatModelKey = "Auto" | "Fast" | "Think" | "Max" | "Image";
+/* The composer picker's lineup: Auto, then every model in the on-device
+   catalog (lib/local/inference/models.ts), by name. A chat saves the key,
+   so catalog keys never change. */
 
 export type ThinkingLevel = "none" | "low" | "medium" | "high";
 
@@ -23,98 +18,94 @@ export const THINKING_LABELS: Record<ThinkingLevel, string> = {
   high: "High",
 };
 
-export type ChatModel = {
-  key: ChatModelKey;
+export type ComposerModel = {
+  key: string;
   name: string;
-  icon: Icon;
-  /** What model search matches besides the name — underlying model names,
-   *  providers, nicknames. Lowercase. */
+  /** Who made it. Absent on Auto. */
+  maker?: Maker;
+  /** One line on what it's good for. */
+  blurb: string;
+  /** What model search matches besides the name. Lowercase. */
   aliases: string[];
-  /** Accepts image input. */
-  vision: boolean;
-  /** Accepts document/file input natively. */
-  files: boolean;
-  /** Paints pictures instead of paragraphs. */
-  imageOutput: boolean;
-  /** What the thinking rotator cycles through — never empty. Models that
-   *  can't think just carry ["none"]; Heavy always reasons, so "none"
-   *  isn't on its wheel at all. */
+  /** What the thinking wheel cycles through — never empty. Models that
+   *  can't think carry ["none"]; ones that always do carry ["high"]. */
   thinkingLevels: ThinkingLevel[];
-  /** The model runs the search/thinking gates itself (Auto decides,
-   *  Image has neither) — the picker blanks them out. */
+  /** Auto runs the thinking gate itself, so the picker blanks it out. */
   autoGates: boolean;
+  /** Tuned for code. */
+  code: boolean;
+  /** Starts out pinned to the compact picker. */
+  featured: boolean;
+  /** The download for this device's build. Absent on Auto. */
+  downloadMB?: number;
 };
 
-export const CHAT_MODELS: ChatModel[] = [
-  {
-    key: "Auto",
-    name: "Auto",
-    icon: IconSparklesFilled,
-    aliases: ["auto", "picks for you", "llama", "default"],
-    vision: false,
-    files: false,
-    imageOutput: false,
-    thinkingLevels: ["none"],
-    autoGates: true,
-  },
-  {
-    key: "Fast",
-    name: "Fast",
-    icon: IconBoltFilled,
-    aliases: ["fast", "llama", "llama 3.2", "llama 3.2 1b", "meta", "light"],
-    vision: false,
-    files: false,
-    imageOutput: false,
-    thinkingLevels: ["none"],
+export const AUTO_MODEL: ComposerModel = {
+  key: "Auto",
+  name: "Auto",
+  blurb: "Picks a quick model for this device",
+  aliases: ["auto", "default", "picks for you"],
+  thinkingLevels: ["none"],
+  autoGates: true,
+  code: false,
+  featured: true,
+};
+
+function thinkingLevels(model: LocalModel): ThinkingLevel[] {
+  if (model.thinking === "always") return ["high"];
+  if (model.thinking === "optional") return ["none", "high"];
+  return ["none"];
+}
+
+function composerModel(model: LocalModel): ComposerModel {
+  const thinks = model.thinking !== "never";
+  return {
+    key: model.key,
+    name: model.name,
+    maker: model.maker,
+    blurb: model.blurb,
+    aliases: [
+      model.key,
+      model.maker.toLowerCase(),
+      ...(thinks ? ["thinking", "reasoning"] : []),
+      ...(model.code ? ["code", "coding", "coder"] : []),
+    ],
+    thinkingLevels: thinkingLevels(model),
     autoGates: false,
-  },
-  {
-    key: "Think",
-    name: "Thinking",
-    icon: IconBrainFilled,
-    aliases: ["thinking", "reasoning", "qwen", "qwen 3", "qwen3 1.7b", "alibaba"],
-    vision: false,
-    files: false,
-    imageOutput: false,
-    /* Qwen 3 thinks or it doesn't — there are no levels in between. */
-    thinkingLevels: ["none", "high"],
-    autoGates: false,
-  },
-  {
-    key: "Max",
-    name: "Heavy",
-    icon: IconBarbellFilled,
-    aliases: ["heavy", "llama", "llama 3.2 3b", "meta", "smartest", "max"],
-    vision: false,
-    files: false,
-    imageOutput: false,
-    thinkingLevels: ["none"],
-    autoGates: false,
-  },
-  {
-    key: "Image",
-    name: "Image",
-    icon: IconPhotoFilled,
-    aliases: ["image", "picture", "paint", "draw", "janus", "janus pro", "deepseek"],
-    vision: false,
-    files: false,
-    imageOutput: true,
-    thinkingLevels: ["none"],
-    autoGates: false,
-  },
+    code: Boolean(model.code),
+    featured: Boolean(model.featured),
+  };
+}
+
+/** Every model, Auto first — whichever device it's on. */
+export const CHAT_MODELS: ComposerModel[] = [
+  AUTO_MODEL,
+  ...LOCAL_MODELS.map(composerModel),
 ];
 
 /* Where a composer starts, and where a never-chosen preference lands:
    Auto picks the model so nobody has to (lib/model-pref.ts). */
-export const DEFAULT_MODEL_KEY: ChatModelKey = "Auto";
+export const DEFAULT_MODEL_KEY = "Auto";
 
-/* What the picker actually renders: the static lineup above, each tier
-   wearing the maker and full name of the model it runs
-   (lib/model-catalog.ts). */
-export type ComposerModel = ChatModel & {
-  /** Who made the model it runs ("Meta"). Absent on Auto. */
-  company?: string;
-  /** The tier with the model it runs ("Fast · Llama 3.2 1B") — what the
-   *  catalog list shows. Absent on Auto, which goes by `name`. */
-  fullName?: string;
-};
+/** "700 MB", "1.8 GB" — a download, the way the picker says it. */
+export function formatDownload(megabytes: number): string {
+  return megabytes >= 1000 ? `${(megabytes / 1000).toFixed(1)} GB` : `${megabytes} MB`;
+}
+
+/** The picker's and settings' line under a model's name. */
+export function modelDetails(model: ComposerModel): string {
+  return model.downloadMB
+    ? `${model.blurb} · ${formatDownload(model.downloadMB)}`
+    : model.blurb;
+}
+
+/** The lineup key a saved key stands for — older chats' tier keys
+ *  included — or Auto when it's no longer in the lineup. */
+export function lineupKey(key: string | null | undefined): string {
+  return findModel(key)?.key ?? DEFAULT_MODEL_KEY;
+}
+
+export function lineupModel(key: string | null | undefined): ComposerModel {
+  const lineup = lineupKey(key);
+  return CHAT_MODELS.find((model) => model.key === lineup) ?? AUTO_MODEL;
+}

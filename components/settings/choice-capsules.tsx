@@ -25,10 +25,10 @@ export function ChoiceCapsules<T extends string>({
             role="radio"
             aria-checked={selected}
             onClick={() => onChange(option)}
-            className={`flex h-9 flex-1 cursor-pointer items-center justify-center gap-2 text-[13.5px]/4 font-medium transition-[background-color,color] duration-150 ${
+            className={`flex h-9 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl text-[13.5px]/4 font-medium transition-[background-color,color] duration-150 ${
               selected
                 ? "bg-primary text-primary-foreground"
-                : "bg-well text-muted-foreground shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)] hover:bg-[color-mix(in_oklch,var(--well),var(--foreground)_5%)] hover:text-foreground"
+                : "bg-well text-muted-foreground hover:bg-[color-mix(in_oklch,var(--well),var(--foreground)_5%)] hover:text-foreground"
             }`}
           >
             {OptionIcon && <OptionIcon size={16} />}

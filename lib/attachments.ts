@@ -143,7 +143,7 @@ export function attachmentRejectionReason(
   }
   if (isTextAttachment(file)) return null;
   if (type.startsWith("image/")) {
-    return model.vision ? null : `${model.name} doesn't read images yet.`;
+    return `${model.name} doesn't read images.`;
   }
   return "Waylay reads text and code files.";
 }

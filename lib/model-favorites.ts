@@ -4,12 +4,13 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { useLocalSession, useMutation, useQuery } from "@/lib/local/react";
 
 import { api } from "@/lib/local/api";
-import { CHAT_MODELS } from "@/lib/models";
+import { findModel } from "@/lib/local/inference/models";
+import { CHAT_MODELS, DEFAULT_MODEL_KEY, lineupKey } from "@/lib/models";
 import { showToast } from "@/lib/toasts";
 
-/* Which models the user pinned into the compact picker. The preset tiers
-   start favorited; admin catalog models start unpinned (they live in the
-   search list) and earn a spot via the star.
+/* Which models the user pinned into the compact picker. Auto and a few
+   featured models start pinned; the rest live in the search list and earn
+   a spot via the star.
 
    Synced, cache-then-live: localStorage paints instantly (and is the whole
    story until the database loads), the IndexedDB row is the truth after —
@@ -20,16 +21,19 @@ import { showToast } from "@/lib/toasts";
 const CACHE_KEY = "model-favorites";
 const CHANGE_EVENT = "waylay:model-favorites";
 
-const DEFAULT_KEYS = CHAT_MODELS.map((model) => model.key as string);
+const DEFAULT_KEYS = CHAT_MODELS.filter((model) => model.featured).map((model) => model.key);
 const DEFAULT_SET: ReadonlySet<string> = new Set(DEFAULT_KEYS);
 
-/* Keys are pruned against the lineup, so a model that has since been
-   removed just drops out. */
+/* Keys are folded through the lineup, so an older tier key lands on the
+   model it ran and a model that has since been removed just drops out. */
 function sanitize(value: unknown): string[] | null {
   if (!Array.isArray(value)) return null;
-  return value.filter(
-    (key): key is string => typeof key === "string" && DEFAULT_KEYS.includes(key),
-  );
+  const keys = new Set<string>();
+  for (const key of value) {
+    if (key === DEFAULT_MODEL_KEY) keys.add(key);
+    else if (typeof key === "string" && findModel(key)) keys.add(lineupKey(key));
+  }
+  return [...keys];
 }
 
 let cached: ReadonlySet<string> | null = null;

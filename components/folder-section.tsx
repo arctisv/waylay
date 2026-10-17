@@ -91,9 +91,9 @@ function FolderRow({
        zone underneath never fights over them — including drops back onto
        the thread's own folder, which are no-ops. */
     <div
-      className={`transition-[background-color,box-shadow] duration-150 ${
+      className={`rounded-lg transition-[background-color,box-shadow] duration-150 ${
         dragOver
-          ? "bg-black/[0.04] ring-1 ring-ring ring-inset dark:bg-white/[0.04]"
+          ? "bg-black/[0.06] dark:bg-white/[0.06]"
           : ""
       }`}
       onDragOver={(event) => {
@@ -132,7 +132,7 @@ function FolderRow({
         <button
           type="button"
           onClick={onToggle}
-          className="relative flex h-8 w-full cursor-pointer items-center gap-1.5 pr-8 pl-1.5 text-[13.5px]/4 font-medium text-foreground-soft before:absolute before:-inset-x-3 before:-inset-y-px"
+          className="relative flex h-8 w-full cursor-pointer items-center gap-1.5 rounded-lg pr-8 pl-1.5 text-[13.5px]/4 font-medium text-foreground-soft before:absolute before:-inset-x-3 before:-inset-y-px"
         >
           <RowPill className="group-has-data-popup-open/folder:bg-accent" />
           <IconChevronRight
@@ -154,7 +154,7 @@ function FolderRow({
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger
             aria-label={`Actions for ${folder.name}`}
-            className="absolute top-1/2 right-1 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-foreground-soft opacity-0 transition-opacity duration-150 group-hover/folder:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100 coarse:opacity-100"
+            className="absolute top-1/2 right-1 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm text-foreground-soft opacity-0 transition-opacity duration-150 group-hover/folder:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100 coarse:opacity-100"
           >
             <IconDots size={16} />
           </DropdownMenuTrigger>

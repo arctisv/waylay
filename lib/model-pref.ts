@@ -2,12 +2,12 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 
-import { CHAT_MODELS, DEFAULT_MODEL_KEY } from "@/lib/models";
+import { DEFAULT_MODEL_KEY, lineupKey } from "@/lib/models";
 
 /* The composer's model, remembered across visits. The stored value is a
-   tier key or a catalog slug (lib/model-catalog.ts) — kept as-is even if a
-   catalog model has since been removed; the composer already falls back to
-   the first entry when a key doesn't resolve. It rides a tiny external
+   lineup key (lib/models.ts); one that has since left the lineup reads back
+   as Auto, and older tier keys read back as the model they ran. It rides a
+   tiny external
    store (mirrors lib/composer-gates.ts) so the marketing composer, the
    chat composer and the command palette all see a pick the same frame,
    and so the remembered model paints on the first client frame instead of
@@ -17,8 +17,7 @@ import { CHAT_MODELS, DEFAULT_MODEL_KEY } from "@/lib/models";
    model answered it. Only a pick made in the picker counts. Those arranged
    writes still dress the composer for the visit, but they never overwrite
    a pick in storage — so a user who picked always finds what they chose.
-   On their own they persist unmarked: a model in the lineup stays put,
-   and anything else reads back as Auto. */
+   On their own they persist unmarked. */
 
 const KEY = "composer-model";
 const EXPLICIT_KEY = "composer-model-explicit";
@@ -39,8 +38,7 @@ function read(): string {
   try {
     const stored = localStorage.getItem(KEY);
     if (!stored) return DEFAULT_MODEL_KEY;
-    if (localStorage.getItem(EXPLICIT_KEY) === "1") return stored;
-    return CHAT_MODELS.some((model) => model.key === stored) ? stored : DEFAULT_MODEL_KEY;
+    return lineupKey(stored);
   } catch {
     // private mode etc. — the default stands for this visit
     return DEFAULT_MODEL_KEY;
@@ -78,10 +76,9 @@ export function useModelPref() {
     cached = next;
     try {
       /* An arranged model rides this visit but never overwrites a pick —
-         otherwise picking Heavy and sending would un-pick it the moment
+         otherwise picking Qwen 3 4B and sending would un-pick it the moment
          the reply came back wearing the model you just chose. With nothing
-         picked there's nothing to protect, so it persists unmarked and
-         stays put if it's in the lineup (anything else reads back as Auto). */
+         picked there's nothing to protect, so it persists unmarked. */
       if (!arranged || localStorage.getItem(EXPLICIT_KEY) !== "1") {
         localStorage.setItem(KEY, next);
         localStorage.setItem(EXPLICIT_KEY, arranged ? "0" : "1");

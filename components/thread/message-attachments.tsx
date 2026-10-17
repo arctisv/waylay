@@ -1,45 +1,9 @@
-"use client";
-
-import { useState } from "react";
-
 import { formatSize } from "@/lib/attachments";
 import type { MessageAttachment } from "@/lib/messages";
-import { ImageLightbox } from "@/components/ui/image-lightbox";
 import { fileGlyph, fileLabel } from "../composer-attachments";
 
 /* Read-only chips for attachments already sent with a message — the
-   composer tray's chips minus the remove button and progress. Images show
-   as thumbs (click for a large view), everything else as a flat file
-   chip. */
-
-function ImageThumb({ attachment }: { attachment: MessageAttachment }) {
-  const [open, setOpen] = useState(false);
-  if (!attachment.url) return null;
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        title={attachment.name}
-        aria-label={`View ${attachment.name}`}
-        className="block cursor-zoom-in"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element -- local object URL */}
-        <img
-          src={attachment.url}
-          alt={attachment.name}
-          className="h-24 w-auto min-w-16 max-w-56 object-cover ring-1 ring-black/[0.06] dark:ring-white/[0.08]"
-        />
-      </button>
-      <ImageLightbox
-        src={attachment.url}
-        alt={attachment.name}
-        open={open}
-        onOpenChange={setOpen}
-      />
-    </>
-  );
-}
+   composer tray's chips minus the remove button and progress. */
 
 export function MessageAttachments({
   attachments,
@@ -49,13 +13,10 @@ export function MessageAttachments({
   if (attachments.length === 0) return null;
   return (
     <div className="flex flex-wrap justify-end gap-2">
-      {attachments.map((attachment) =>
-        attachment.type.startsWith("image/") && attachment.url ? (
-          <ImageThumb key={attachment.id} attachment={attachment} />
-        ) : (
+      {attachments.map((attachment) => (
           <div
             key={attachment.id}
-            className="flex w-52 items-center gap-2.5 bg-black/[0.05] px-3 py-2 dark:bg-white/[0.06]"
+            className="flex w-52 items-center gap-2.5 rounded-2xl bg-black/[0.05] px-3 py-2 dark:bg-white/[0.06]"
           >
             {fileGlyph(
               attachment.name,
@@ -72,8 +33,7 @@ export function MessageAttachments({
               </div>
             </div>
           </div>
-        ),
-      )}
+      ))}
     </div>
   );
 }

@@ -73,14 +73,12 @@ export function writeThreadMessageCache(
     .slice(-MAX_MESSAGES_PER_THREAD)
     .map((message) => ({
       ...message,
-      /* No file text (it balloons) and no object URLs (they die with the
-         tab, so a reload would paint broken pictures until live data lands). */
-      attachments: message.attachments?.map(({ id, name, size, type, url }) => ({
+      /* No file text: it balloons. */
+      attachments: message.attachments?.map(({ id, name, size, type }) => ({
         id,
         name,
         size,
         type,
-        ...(url && !url.startsWith("blob:") ? { url } : {}),
       })),
     }));
   const payload = JSON.stringify(settled);

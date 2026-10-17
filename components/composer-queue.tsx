@@ -64,10 +64,10 @@ export function ComposerQueue({
             {...ROW}
             className="overflow-hidden"
           >
-            <div className="flex h-8 items-center gap-2 pr-1 pl-2 text-[13.5px]/4 text-muted-foreground">
+            <div className="flex h-8 items-center gap-2 rounded-full pr-1 pl-3 text-[13.5px]/4 text-muted-foreground">
               <span
                 aria-label={`Queued, ${index + 1} of ${items.length}`}
-                className="flex size-[18px] shrink-0 items-center justify-center bg-black/[0.06] text-[10.5px]/none font-semibold tabular-nums dark:bg-white/[0.09]"
+                className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-black/[0.06] text-[10.5px]/none font-semibold tabular-nums dark:bg-white/[0.09]"
               >
                 {index + 1}
               </span>
@@ -78,7 +78,7 @@ export function ComposerQueue({
                   aria-label="Remove from queue"
                   title="Remove from queue"
                   onClick={() => onRemove(item)}
-                  className="flex size-6 shrink-0 cursor-pointer items-center justify-center transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]"
+                  className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors duration-150 hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]"
                 >
                   <IconX size={14} />
                 </button>

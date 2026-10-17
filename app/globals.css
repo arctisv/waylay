@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "gradient-border-plugin";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "./accents.css";
@@ -53,14 +52,8 @@
   --background: #f3f3f3;
   /* The recess for components sunk INTO the surface (composer, prompt
      bubbles, starter capsules, in-menu search fields) — the rail's tone
-     borrowed onto white, with the edge treatment below carrying
-     definition. */
+     borrowed onto white. Fill alone sets it apart; nothing is outlined. */
   --well: #f3f3f3;
-  /* The wells' edge: a very thin uniform outline whose top edge catches
-     light. Painted via an inset shadow utility (see composer/capsules) so
-     it composes with Tailwind's ring shadows. */
-  --well-outline: rgb(0 0 0 / 0.05);
-  --well-highlight: rgb(255 255 255 / 0.9);
   /* The floating thread composer: the same well tone, but see-through so
      messages sliding beneath it read through the frost. Hand-mixed for the
      same reason as --popover-translucent. */
@@ -75,16 +68,13 @@
   --card-foreground: #141414;
   --popover: #ffffff;
   --popover-foreground: #141414;
-  /* Waylay's ink: deep blue as a flat color, and a black-to-blue gradient
-     with a film of grain wherever a surface is filled with it (the
-     .bg-primary rule in app/accents.css). Picking another accent in
-     Personalization swaps both for that accent's flat color. */
-  --primary: oklch(0.36 0.16 264);
+  /* Waylay's ink: one solid blue, the same in light and dark. Picking
+     another accent in Personalization swaps it (app/accents.css). */
+  --primary: oklch(0.56 0.21 262);
   /* Solid hover tone — bg-primary/90 would compile to solid (see the
      translucent-popover note), so the hover shade is its own token. */
-  --primary-hover: oklch(0.42 0.17 264);
+  --primary-hover: oklch(0.62 0.2 262);
   --primary-foreground: oklch(0.985 0 0);
-  --accent-gradient: linear-gradient(135deg, #09090b 0%, #0c1c52 52%, #2563eb 100%);
   --secondary: oklch(0.96 0 0);
   --secondary-foreground: oklch(0.2 0 0);
   /* A step below the chrome so skeleton bones stay visible on the rail. */
@@ -97,19 +87,13 @@
   --accent-pressed: #eeeeee;
   --accent-foreground: oklch(0.2 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  /* A wash of the destructive hue for notice panels, and its edge. Hand-mixed
-     for the same reason as --well-translucent: bg-destructive/8 compiles
-     solid, which is a red box instead of a red hint. */
-  --destructive-soft: rgb(220 38 38 / 0.07);
-  --destructive-outline: rgb(220 38 38 / 0.16);
-  --input: oklch(0.9 0 0);
   --ring: oklch(0.6 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0;
+  --radius: 10px;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -141,15 +125,20 @@
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
     "Liberation Mono", "Courier New", monospace;
 
-  /* Waylay is square: every radius step is zero. */
-  --radius-xs: 0;
-  --radius-sm: 0;
-  --radius-md: 0;
-  --radius-lg: 0;
-  --radius-xl: 0;
-  --radius-2xl: 0;
-  --radius-3xl: 0;
-  --radius-4xl: 0;
+  /* Corners nest: whatever sits inside a rounded surface takes the
+     surface's radius minus the padding between them, so the two curves
+     run parallel. The steps are spaced so the common pairs land on a
+     token — a 14px menu with 4px padding holds 10px rows, an 18px card
+     with 8px padding holds 10px tiles, the 26px composer with 8px
+     padding holds 18px buttons and chips. */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-3xl: 22px;
+  --radius-4xl: 26px;
 
   --font-heading: var(--font-sans);
 
@@ -180,8 +169,6 @@
   --color-chart-1: var(--chart-1);
 
   --color-ring: var(--ring);
-
-  --color-input: var(--input);
 
   --color-destructive: var(--destructive);
 
@@ -222,8 +209,6 @@
   /* Wells go LIGHTER than the panel, not darker — same tonal elevation the
      popovers use; a darker pit read muddy. */
   --well: #242424;
-  --well-outline: rgb(255 255 255 / 0.05);
-  --well-highlight: rgb(255 255 255 / 0.12);
   --well-translucent: rgb(36 36 36 / 0.72);
   --popover-translucent: rgb(38 38 38 / 0.88);
   --foreground: #f0f0f0;
@@ -236,10 +221,9 @@
      separate #181818 from #181818. */
   --popover: #262626;
   --popover-foreground: #f0f0f0;
-  --primary: oklch(0.8 0.1 262);
-  --primary-hover: oklch(0.85 0.09 262);
-  --primary-foreground: oklch(0.17 0 0);
-  --accent-gradient: linear-gradient(135deg, #ffffff 0%, #d9e5ff 40%, #4d8bff 100%);
+  --primary: oklch(0.56 0.21 262);
+  --primary-hover: oklch(0.62 0.2 262);
+  --primary-foreground: oklch(0.985 0 0);
   --secondary: #292929;
   --secondary-foreground: oklch(0.985 0 0);
   /* Clears the rail as well as the panel, or skeleton bones vanish into
@@ -251,10 +235,6 @@
   --accent-pressed: #2a2a2a;
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  /* Lighter mix on dark: the same 7% over #181818 would barely register. */
-  --destructive-soft: rgb(248 113 113 / 0.1);
-  --destructive-outline: rgb(248 113 113 / 0.2);
-  --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.56 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -381,48 +361,19 @@ body {
   }
 }
 
-/* The gleam sweeping across a generated image's placeholder square. CSS,
-   not motion: the message row re-renders on every reactive update while
-   the paint is in flight, and a JS keyframe loop would restart each time. */
-@keyframes image-shimmer {
-  0% {
-    transform: translateX(-120%);
-  }
-  100% {
-    transform: translateX(320%);
-  }
+/* Depth without outlines: floating surfaces (menus, dialogs, toasts, the
+   buttons that hover over the transcript) lift on a soft shadow. Dark mode
+   leans on tonal elevation — the popover fill already steps up off the
+   panel — with a deeper shadow under it. */
+.raised {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 8px 24px -6px rgb(0 0 0 / 0.14);
 }
-
-.image-shimmer-gleam {
-  animation: image-shimmer 1.2s ease-in-out infinite;
-}
-
-@keyframes image-shimmer-pulse {
-  0%,
-  100% {
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .image-shimmer-gleam {
-    animation: image-shimmer-pulse 1.4s ease-in-out infinite;
-    transform: none;
-  }
-}
-
-/* Depth for dark mode: inverted drop shadows don't read on dark surfaces,
-   so raised elements (cards, menus, dialogs, toasts) get a hairline inset
-   highlight instead — a 1px lit top edge plus a faint 0.5px trace around,
-   as if lit from above. Inert in light mode, where the hairline borders
-   already carry the depth. */
 .dark .raised {
   box-shadow:
-    inset 0 1px 0 0 rgb(255 255 255 / 0.06),
-    inset 0 0 0 0.5px rgb(255 255 255 / 0.04);
+    0 1px 2px rgb(0 0 0 / 0.3),
+    0 10px 28px -6px rgb(0 0 0 / 0.55);
 }
 
 /* Transitions.dev — Skeleton loader and reveal
@@ -578,6 +529,28 @@ body {
   cursor: pointer;
 }
 
+/* Code blocks, filled rather than outlined: a tinted shell holding the
+   code on the plain surface. The body's radius is the shell's minus the
+   8px between them. Unlayered so it outranks Streamdown's own utilities. */
+[data-streamdown="code-block"] {
+  border: 0;
+  border-radius: var(--radius-2xl);
+  background: var(--well);
+}
+[data-streamdown="code-block-body"] {
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+[data-streamdown="code-block-actions"] {
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--well);
+}
+[data-streamdown="inline-code"] {
+  border-radius: var(--radius-sm);
+}
+
 /* Streamdown renders one <span> per code line but only marks lines
    display:block when line numbers are on (the `block` rides the numbered
    variant's class) — with our lineNumbers={false} every line lands inline
@@ -599,15 +572,6 @@ body {
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0.15em 0.1em;
-}
-
-/* Square corners everywhere. Unlayered on purpose: it outranks every
-   layered utility, including the fixed-radius ones Streamdown ships
-   (`rounded`, `rounded-full`) for code blocks and badges. */
-*,
-::before,
-::after {
-  border-radius: 0;
 }
 
 @layer base {

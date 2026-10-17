@@ -177,7 +177,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
        scrolling that gets switched off underneath it. */
     <div className="app-frame flex h-dvh w-full flex-col bg-background md:flex-row">
       <Sidebar />
-      <main className="raised relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-surface md:my-2 md:mr-2 md:border md:border-border">
+      <main className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-surface md:my-2 md:mr-2 md:rounded-2xl">
         <PageSlide
           page={awayFace === null ? 1 : 2}
           className="min-h-0 flex-1"

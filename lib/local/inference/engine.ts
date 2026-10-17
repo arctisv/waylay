@@ -6,7 +6,6 @@ import {
   loadCpu,
   unloadCpu,
 } from "./cpu-engine";
-import { unloadImageModel } from "./image-engine";
 import type { Runtime } from "./models";
 import {
   interruptWebgpu,
@@ -63,8 +62,6 @@ export function loadRuntime(
   onProgress?: (progress: LoadProgress) => void,
 ): Promise<ChatEngine> {
   const run = async () => {
-    /* One big model in memory at a time: the picture model steps aside. */
-    unloadImageModel();
     if (active && active !== runtime.backend) await unloadEngine();
     active = runtime.backend;
     return runtime.backend === "webgpu"

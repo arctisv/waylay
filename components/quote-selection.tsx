@@ -125,7 +125,7 @@ export function QuoteSelectionPopover() {
             type="button"
             onMouseDown={(event) => event.preventDefault()}
             onClick={handleQuote}
-            className="raised flex h-8 cursor-pointer items-center gap-1.5 border border-border bg-popover px-3 text-[12.5px] font-medium text-foreground shadow-sm transition-[background-color,scale] duration-150 hover:bg-accent active:scale-[0.96]"
+            className="raised flex h-8 cursor-pointer items-center gap-1.5 rounded-full bg-popover px-3 text-[12.5px] font-medium text-foreground transition-[background-color,scale] duration-150 hover:bg-accent active:scale-[0.96]"
           >
             <IconQuote size={14} stroke={2} />
             Quote

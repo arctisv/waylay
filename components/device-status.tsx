@@ -110,7 +110,7 @@ export function DeviceStatusPills() {
             type="button"
             onClick={() => setDialogOpen(true)}
             /* The dock it sits in passes pointers through; the pill takes them. */
-            className={`pointer-events-auto inline-flex cursor-pointer items-center gap-1 px-2 py-1 text-[11px] font-medium ${
+            className={`pointer-events-auto inline-flex cursor-pointer items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium ${
               notice === "cpu"
                 ? "bg-black/[0.05] text-muted-foreground dark:bg-white/[0.06]"
                 : "bg-orange-500/12 text-orange-700 dark:text-orange-300"

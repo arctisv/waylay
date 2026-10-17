@@ -83,7 +83,7 @@ export function SendButton({
               ? onVoice
               : onSend
       }
-      className={`relative size-9 shrink-0 justify-center p-0 transition-[background-color,scale,opacity] disabled:pointer-events-none ${
+      className={`relative size-9 shrink-0 justify-center rounded-full p-0 transition-[background-color,scale,opacity] disabled:pointer-events-none ${
         /* While the send is in flight the spinner stays full-strength —
            the button is working, not unavailable. */
         state === "send" || state === "queue" ? "disabled:opacity-40" : ""

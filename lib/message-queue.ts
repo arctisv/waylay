@@ -7,7 +7,7 @@ import { api } from "@/lib/local/api";
 import type { Id } from "@/lib/local/data-model";
 
 import type { AttachmentUpload } from "./attachments";
-import { CHAT_MODELS, type ThinkingLevel } from "./models";
+import { lineupKey, type ThinkingLevel } from "./models";
 
 /* Messages typed while a reply was still being written. They wait in the
    local database, not in the composer (lib/local/backend/messageQueue.ts):
@@ -42,10 +42,8 @@ export type QueueMessageArgs = {
 };
 
 
-/* Same folding a send does: catalog slugs verbatim, tier keys or Auto. */
-function wireModel(model: string): string {
-  return CHAT_MODELS.find((entry) => entry.key === model)?.key ?? "Auto";
-}
+/* Same folding a send does: a model in the lineup, or Auto. */
+const wireModel = lineupKey;
 
 export function useQueueActions() {
   const enqueueBase = useMutation(api.messageQueue.enqueue);

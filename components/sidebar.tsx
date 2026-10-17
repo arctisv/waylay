@@ -121,7 +121,7 @@ export function Sidebar() {
           type="button"
           onClick={toggleCollapsed}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="ml-auto -mr-1.5 hidden size-7 shrink-0 cursor-pointer items-center justify-center text-foreground-soft opacity-0 transition-[opacity,background-color] duration-150 group-hover/sidebar:opacity-100 hover:bg-accent focus-visible:opacity-100 sidebar-collapsed:absolute sidebar-collapsed:inset-0 sidebar-collapsed:m-auto md:flex"
+          className="ml-auto -mr-1.5 hidden size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-foreground-soft opacity-0 transition-[opacity,background-color] duration-150 group-hover/sidebar:opacity-100 hover:bg-accent focus-visible:opacity-100 sidebar-collapsed:absolute sidebar-collapsed:inset-0 sidebar-collapsed:m-auto md:flex"
         >
           {collapsed ? (
             <IconLayoutSidebarLeftExpandFilled size={18} />

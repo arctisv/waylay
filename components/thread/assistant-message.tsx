@@ -31,7 +31,6 @@ import { isCompactPhase } from "@/lib/phase-activity";
 import { toggleReadAloud, useCanReadAloud, useReadingAloud } from "@/lib/read-aloud";
 import { useTypewriter } from "@/lib/use-typewriter";
 import { CheckpointMenu } from "./checkpoint-menu";
-import { GeneratedImageSlot } from "./generated-image";
 import { Markdown } from "./markdown";
 import { MessageActionButton } from "./message-action-button";
 import { MessageStats } from "./message-stats";
@@ -116,18 +115,7 @@ export function AssistantMessage({
 
   const streamingNow = !terminal && !error;
   const showText = !error && text.length > 0;
-  /* A picture reply paints in its own frame (GeneratedImageSlot), which
-     carries the painting's progress — so that phase stays out of the
-     activity line, which only narrates the model download. */
-  const imageTurn = message.model === "Image" && !error;
-  const phases = useMemo(
-    () =>
-      imageTurn
-        ? (message.phases ?? []).filter((phase) => phase.kind !== "image")
-        : (message.phases ?? []),
-    [imageTurn, message.phases],
-  );
-  const paintingNow = imageTurn && phases.length === 0;
+  const phases = useMemo(() => message.phases ?? [], [message.phases]);
   /* Once compact tool work begins, its activity stays in progress through
      inter-call gaps. Only the terminal message update settles the summary. */
   const {
@@ -138,7 +126,6 @@ export function AssistantMessage({
     terminal,
     canShowActivity: streamingNow,
     showText,
-    richerActivityWorking: paintingNow,
   });
   const renderableText = error ? "" : text;
   const renderPlan = useMemo(
@@ -268,7 +255,6 @@ export function AssistantMessage({
       className="group/msg flex w-full min-w-0 flex-col items-start"
     >
       {planChildren}
-      {imageTurn && <GeneratedImageSlot message={message} />}
       {error && <ErrorBanner error={error} onRetry={onRetry} />}
       {message.status === "stopped" && (
         <div className="mt-2 flex items-center gap-1.5 text-[13px]/4 font-medium text-muted-foreground">
@@ -302,7 +288,7 @@ function ErrorBanner({
   onRetry?: () => void;
 }) {
   return (
-    <div className="flex w-full max-w-md flex-col gap-3 bg-well px-4 py-3.5 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
+    <div className="flex w-full max-w-md flex-col gap-3 rounded-2xl bg-well px-4 py-3.5">
       <div className="flex items-start gap-2.5">
         <IconAlertTriangleFilled
           size={17}
@@ -320,7 +306,7 @@ function ErrorBanner({
           <button
             type="button"
             onClick={onRetry}
-            className="cursor-pointer bg-primary px-3 py-1.5 text-[13px]/4 font-medium text-primary-foreground transition-[background-color,scale] duration-150 hover:bg-(--primary-hover) active:scale-[0.96]"
+            className="cursor-pointer rounded-full bg-primary px-3 py-1.5 text-[13px]/4 font-medium text-primary-foreground transition-[background-color,scale] duration-150 hover:bg-(--primary-hover) active:scale-[0.96]"
           >
             Try again
           </button>

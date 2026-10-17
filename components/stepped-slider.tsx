@@ -100,7 +100,7 @@ export function SteppedSlider({
         onIndexChange(Math.min(last, Math.max(0, target)));
       }}
       style={{ width: TRACK_WIDTH }}
-      className={`relative h-4.5 shrink-0 touch-none overflow-hidden bg-black/[0.15] outline-none focus-visible:ring-2 focus-visible:ring-ring dark:bg-white/[0.2] ${
+      className={`relative h-4.5 shrink-0 touch-none overflow-hidden rounded-full bg-black/[0.15] outline-none focus-visible:bg-black/[0.24] dark:bg-white/[0.2] dark:focus-visible:bg-white/[0.3] ${
         disabled ? "" : "cursor-pointer"
       }`}
     >
@@ -112,7 +112,7 @@ export function SteppedSlider({
           style={{
             left: TRACK_PAD + KNOB / 2 + (stop / last) * USABLE,
           }}
-          className="absolute top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 bg-black/[0.2] dark:bg-white/[0.25]"
+          className="absolute top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/[0.2] dark:bg-white/[0.25]"
         />
       ))}
       <motion.span
@@ -120,7 +120,7 @@ export function SteppedSlider({
         initial={false}
         animate={{ width: TRACK_PAD + knobX + KNOB + TRACK_PAD }}
         transition={SNAP_SPRING}
-        className="absolute inset-y-0 left-0 bg-primary"
+        className="absolute inset-y-0 left-0 rounded-full bg-primary"
       />
       <motion.span
         aria-hidden
@@ -128,7 +128,7 @@ export function SteppedSlider({
         animate={{ x: knobX }}
         transition={SNAP_SPRING}
         transformTemplate={pinRasterPath}
-        className="absolute top-0.5 left-0.5 block size-3.5 bg-surface ring-1 ring-black/[0.06] dark:ring-white/[0.08]"
+        className="absolute top-0.5 left-0.5 block size-3.5 rounded-full bg-surface"
       />
     </div>
   );

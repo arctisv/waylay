@@ -11,22 +11,23 @@ import { deleteWebgpuModel, isWebgpuModelCached } from "./inference/webgpu-engin
    and the space they take. Everything here is local; deleting only frees
    space, and a deleted model downloads again the next time it's needed. */
 
-const builds = (model: LocalModel) => [model.builds.f16, model.builds.f32];
+const gpuBuilds = (model: LocalModel) =>
+  model.gpu ? [model.gpu.f16, model.gpu.f32].filter((id): id is string => Boolean(id)) : [];
 
-/** Whether either build of a GPU chat model is downloaded. */
-export async function isModelDownloaded(model: LocalModel): Promise<boolean> {
-  const results = await Promise.all(builds(model).map(isWebgpuModelCached));
+/** Whether either GPU build of a chat model is downloaded. */
+export async function isGpuBuildDownloaded(model: LocalModel): Promise<boolean> {
+  const results = await Promise.all(gpuBuilds(model).map(isWebgpuModelCached));
   return results.some(Boolean);
 }
 
-export async function deleteModelDownload(model: LocalModel): Promise<void> {
-  for (const build of builds(model)) {
+export async function deleteGpuBuild(model: LocalModel): Promise<void> {
+  for (const build of gpuBuilds(model)) {
     if (await isWebgpuModelCached(build)) await deleteWebgpuModel(build);
   }
 }
 
-/* Models fetched with Transformers.js — the processor chat model, voice
-   and pictures — are addressed by their Hugging Face repo. */
+/* Models fetched with Transformers.js — the processor chat models and
+   voice — are addressed by their Hugging Face repo. */
 export const isRepoDownloaded = isCpuModelCached;
 export const deleteRepoDownload = deleteCpuModel;
 

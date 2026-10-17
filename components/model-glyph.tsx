@@ -1,16 +1,19 @@
+import { IconSparklesFilled } from "@tabler/icons-react";
+
+import { MakerLogo } from "@/components/icons/maker-logos";
 import type { ComposerModel } from "@/lib/models";
 
-/* A model's face at any size: its tier's Tabler glyph. Color follows
-   currentColor, so callers just set a text class. */
+/* A model's face at any size: its maker's mark, or Auto's sparkles. Color
+   follows currentColor, so callers just set a text class. */
 export function ModelGlyph({
   model,
   size = 15,
   className = "",
 }: {
-  model: Pick<ComposerModel, "icon">;
+  model: Pick<ComposerModel, "maker">;
   size?: number;
   className?: string;
 }) {
-  const Icon = model.icon;
-  return <Icon size={size} className={className} />;
+  if (!model.maker) return <IconSparklesFilled size={size} className={className} />;
+  return <MakerLogo maker={model.maker} size={size} className={className} />;
 }

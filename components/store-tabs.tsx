@@ -6,9 +6,11 @@ import { motion } from "motion/react";
 import { pinRasterPath } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-/* Tab chips: free-standing blocks with air between them — the active one
-   filled with primary ink, the rest just a hairline ring until hovered. A
-   tally rides along as a smaller dimmed figure.
+/* Tab chips: free-standing capsules with air between them — the active one
+   filled with primary ink, the rest a quiet fill until hovered. A tally
+   rides along as a smaller dimmed figure. The fill's radius is styled
+   inline so motion can keep the capsule's corners round while the pill
+   stretches between different-width chips.
  *
  * Shared by the store (two or three chips, side by side) and the settings
  * face on a phone (nine, in a scroller — that's where the rail's section
@@ -65,12 +67,12 @@ export function StoreTabs<T extends string>({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(tab.value)}
-            className={`group relative h-8 shrink-0 cursor-pointer px-3.5 transition-[box-shadow,background-color,scale] duration-150 active:scale-[0.96] ${
+            className={`group relative h-8 shrink-0 cursor-pointer rounded-full px-3.5 transition-[box-shadow,background-color,scale] duration-150 active:scale-[0.96] ${
               active
                 ? glide
                   ? ""
                   : "bg-primary"
-                : "ring-1 ring-border hover:bg-muted"
+                : "bg-black/[0.05] hover:bg-black/[0.08] dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
             }`}
           >
             {active && glide && (
@@ -78,6 +80,7 @@ export function StoreTabs<T extends string>({
                 layoutId="store-tab-chip"
                 transition={{ type: "spring", stiffness: 480, damping: 38 }}
                 transformTemplate={pinRasterPath}
+                style={{ borderRadius: 16 }}
                 className="absolute inset-0 bg-primary"
               />
             )}

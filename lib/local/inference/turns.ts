@@ -4,7 +4,6 @@ import type { MessagePhase } from "@/lib/messages";
 import { MAX_MEMORY_LENGTH } from "../backend/userMemory";
 import { createId, db } from "../db";
 import { getDeviceSupport } from "../device/support";
-import type { SupportReport } from "../device/types";
 import type { AttachmentRow, MessageRow, SendOptions } from "../schema";
 import { getSetting, memoryEnabled } from "../settings";
 import { threadMessages } from "../threads";
@@ -15,15 +14,8 @@ import {
   type ChatEngine,
   type EngineMessage,
   type LoadProgress,
-  unloadEngine,
 } from "./engine";
-import {
-  IMAGE_MODEL,
-  isImageModelLoaded,
-  loadImageModel,
-  paintImage,
-} from "./image-engine";
-import { localModelFor, runtimeFor, type Runtime } from "./models";
+import { findModel, runtimeFor, type Runtime } from "./models";
 import {
   buildSystemPrompt,
   THREAD_TITLE_FROM_TRANSCRIPT_PROMPT,
@@ -108,8 +100,12 @@ export function appendUserTurn({
   now: number;
 }) {
   const streamId = createId();
-  /* Only a reasoning model can think; any other turn just answers. */
-  const thinking = Boolean(options?.thinking) && localModelFor(options?.model).reasoning;
+  /* Only a reasoning model can think, and some always do; any other turn
+     just answers. */
+  const model = findModel(options?.model);
+  const thinking =
+    model?.thinking === "always" ||
+    (model?.thinking === "optional" && Boolean(options?.thinking));
   const userMessageId = db.insert("messages", {
     threadId,
     role: "user",
@@ -175,16 +171,6 @@ async function runTurn(turn: Turn): Promise<void> {
   try {
     const support = await getDeviceSupport();
     if (support.status !== "ready") throw new UnsupportedDeviceError();
-    /* Auto picks for you: a request for a picture goes to the Image model
-       wherever it can run. */
-    if (message.model === "Auto" && support.backend === "webgpu" && asksForPicture(turnPrompt(turn, message))) {
-      db.patch("messages", message._id, { model: "Image" });
-      message.model = "Image";
-    }
-    if (message.model === "Image") {
-      await runPaintTurn(turn, message, support, startedAt);
-      return;
-    }
     const runtime = runtimeFor(message.model, support);
     const engine = await prepareModel(message, runtime);
     if (turn.cancelled) return;
@@ -206,7 +192,8 @@ async function runTurn(turn: Turn): Promise<void> {
         content: `${conversation[0].content}\n\nYou just saved this to memory about them: "${asked}" Confirm it in a few words, speaking to them as "you".`,
       };
     }
-    let result = await generate({ engine, turn, message, runtime, conversation, phases, tools: true });
+    const tools = runtime.model.tools !== null;
+    let result = await generate({ engine, turn, message, runtime, conversation, phases, tools });
     outputTokens += result.completionTokens ?? 0;
 
     if (!turn.cancelled && result.toolCall) {
@@ -269,7 +256,7 @@ async function prepareModel(message: MessageRow, runtime: Runtime): Promise<Chat
   const phase = (progress: LoadProgress | null): MessagePhase => ({
     kind: "model",
     pending: true,
-    action: loadingLabel(runtime, progress),
+    action: loadingLabel(runtime.model.name, runtime.downloadMB, progress),
   });
   writePhases(message._id, [phase(null)]);
   let lastWrite = 0;
@@ -283,82 +270,11 @@ async function prepareModel(message: MessageRow, runtime: Runtime): Promise<Chat
   return engine;
 }
 
-function loadingLabel(
-  model: { label: string; downloadMB: number },
-  progress: LoadProgress | null,
-): string {
-  if (!progress) return `Getting ${model.label} ready`;
+function loadingLabel(name: string, downloadMB: number, progress: LoadProgress | null): string {
+  if (!progress) return `Getting ${name} ready`;
   const percent = Math.round(progress.value * 100);
-  if (progress.cached) return `Loading ${model.label} · ${percent}%`;
-  return `Downloading ${model.label} · ${percent}% of ${formatSize(model.downloadMB)}`;
-}
-
-/* ---- Pictures ------------------------------------------------------------ */
-
-/** A turn on the Image model: paints the person's message as a picture and
- *  keeps it on the reply. */
-async function runPaintTurn(
-  turn: Turn,
-  message: MessageRow,
-  support: SupportReport,
-  startedAt: number,
-): Promise<void> {
-  if (support.backend !== "webgpu") throw new PaintingNeedsGpuError();
-  const prompt = turnPrompt(turn, message);
-  if (!prompt) throw new Error("There's nothing to paint.");
-
-  /* One big model in memory at a time: the text model steps aside. */
-  await unloadEngine();
-  if (!isImageModelLoaded()) {
-    let lastWrite = 0;
-    const phase = (progress: LoadProgress | null): MessagePhase => ({
-      kind: "model",
-      pending: true,
-      action: loadingLabel(IMAGE_MODEL, progress),
-    });
-    writePhases(message._id, [phase(null)]);
-    await loadImageModel(Boolean(support.specs.shaderF16), (progress) => {
-      const now = Date.now();
-      if (now - lastWrite < PHASE_WRITE_MS && progress.value < 1) return;
-      lastWrite = now;
-      writePhases(message._id, [phase(progress)]);
-    });
-  }
-  if (turn.cancelled) return;
-
-  const painting = (value: number): MessagePhase => ({
-    kind: "image",
-    pending: true,
-    action: `Painting · ${Math.round(value * 100)}%`,
-  });
-  writePhases(message._id, [painting(0)]);
-  let lastWrite = 0;
-  const blob = await paintImage(prompt, (value) => {
-    const now = Date.now();
-    if (now - lastWrite < PHASE_WRITE_MS) return;
-    lastWrite = now;
-    if (!turn.cancelled) writePhases(message._id, [painting(value)]);
-  });
-  if (turn.cancelled) return;
-
-  const now = Date.now();
-  db.patch("messages", message._id, {
-    content: "",
-    status: "complete",
-    phases: [],
-    attachments: [
-      {
-        id: createId(),
-        name: `${fileNameFor(prompt)}.png`,
-        size: blob.size,
-        type: blob.type || "image/png",
-        data: blob,
-      },
-    ],
-    durationMs: now - startedAt,
-    updatedAt: now,
-  });
-  db.patch("threads", turn.threadId, { updatedAt: now });
+  if (progress.cached) return `Loading ${name} · ${percent}%`;
+  return `Downloading ${name} · ${percent}% of ${formatSize(downloadMB)}`;
 }
 
 /** The person's message this reply answers. */
@@ -369,26 +285,6 @@ function turnPrompt(turn: Turn, message: MessageRow): string {
       .at(-1)
       ?.content.trim() ?? ""
   );
-}
-
-/* "Draw a fox", "paint me a lighthouse", "generate an image of…" — asked
-   outright, at the start of the message. */
-const PICTURE_REQUEST =
-  /^(please\s+)?((can|could|would) you\s+)?(draw|paint|sketch|illustrate)\b|^(please\s+)?((can|could|would) you\s+)?(generate|create|make|render)\s+(me\s+)?(an?\s+)?(image|picture|drawing|painting|illustration|photo)\b/i;
-
-function asksForPicture(prompt: string): boolean {
-  return PICTURE_REQUEST.test(prompt.trim());
-}
-
-/** "A fox in the snow, watercolor" → "a-fox-in-the-snow-watercolor". */
-function fileNameFor(prompt: string): string {
-  const slug = prompt
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 48)
-    .replace(/-+$/, "");
-  return slug || "waylay-picture";
 }
 
 function formatSize(megabytes: number): string {
@@ -424,7 +320,7 @@ function buildConversation(
         .map((memory) => memory.memory)
     : [];
   const system = buildSystemPrompt({
-    family: runtime.family,
+    tools: runtime.model.tools,
     preferences: getSetting<{ text: string }>(db, "preferences")?.text ?? null,
     memories,
     memoryEnabled: memoryEnabled(db),
@@ -470,9 +366,17 @@ type Generation = {
   completionTokens?: number;
 };
 
-/** Splits a reply into its <think> reasoning and the answer after it. */
-function splitThinking(raw: string): { thought: string | null; done: boolean; answer: string } {
-  const trimmed = raw.trimStart();
+/** Splits a reply into its <think> reasoning and the answer after it. A
+ *  model that always reasons may leave the opening tag out (its template
+ *  can open the block for it), so for those the reply starts in thought. */
+function splitThinking(
+  raw: string,
+  opensInThought = false,
+): { thought: string | null; done: boolean; answer: string } {
+  const start = raw.trimStart();
+  const trimmed = opensInThought && !"<think>".startsWith(start) && !start.startsWith("<think>")
+    ? `<think>${start}`
+    : start;
   if ("<think>".startsWith(trimmed) && trimmed !== "") return { thought: "", done: false, answer: "" };
   if (!trimmed.startsWith("<think>")) return { thought: null, done: true, answer: raw };
   const body = trimmed.slice("<think>".length);
@@ -503,7 +407,9 @@ async function generate({
   tools: boolean;
 }): Promise<Generation> {
   const streamId = message.streamId!;
-  const reasoning = runtime.reasoning && Boolean(message.thinking);
+  const thinking = runtime.model.thinking;
+  const reasoning = thinking !== "never" && Boolean(message.thinking);
+  const always = thinking === "always";
   let thought: MessagePhase | null = null;
   let thoughtStartedAt = 0;
   let streaming = false;
@@ -511,7 +417,7 @@ async function generate({
 
   const onText = (raw: string) => {
     if (turn.cancelled) return;
-    const split = splitThinking(raw);
+    const split = splitThinking(raw, always);
     if (split.thought !== null && reasoning) {
       if (!thought) {
         thoughtStartedAt = Date.now();
@@ -547,11 +453,11 @@ async function generate({
     maxTokens: REPLY_TOKENS,
     temperature: 0.6,
     topP: 0.9,
-    ...(runtime.reasoning ? { enableThinking: reasoning } : {}),
+    ...(thinking === "optional" ? { enableThinking: reasoning } : {}),
     onText,
   });
 
-  const { answer } = splitThinking(result.text);
+  const { answer } = splitThinking(result.text, always);
   const toolCall = tools ? parseToolCall(answer) : null;
   if (!toolCall && !turn.cancelled) db.setStream(streamId, { text: answer, status: "streaming" });
   return {
@@ -640,7 +546,10 @@ async function writeTitle(threadId: string, fromTranscript: boolean) {
 
   const support = await getDeviceSupport();
   if (support.status !== "ready") return;
-  const runtime = runtimeFor(thread.model ?? undefined, support);
+  const runtime = runtimeFor(thread.model, support);
+  /* A model that always reasons would spend the title's few tokens
+     thinking; the chat keeps its first-message title instead. */
+  if (runtime.model.thinking === "always") return;
   const engine = await loadRuntime(runtime);
   const reply = await engine.generate({
     messages: [
@@ -649,7 +558,7 @@ async function writeTitle(threadId: string, fromTranscript: boolean) {
     ],
     maxTokens: 20,
     temperature: 0.2,
-    ...(runtime.reasoning ? { enableThinking: false } : {}),
+    ...(runtime.model.thinking === "optional" ? { enableThinking: false } : {}),
   });
   const title = sanitizeTitle(splitThinking(reply.text).answer);
   if (title && db.get("threads", threadId)) {
@@ -666,19 +575,9 @@ class UnsupportedDeviceError extends Error {
   }
 }
 
-class PaintingNeedsGpuError extends Error {
-  constructor() {
-    super("Painting needs WebGPU.");
-    this.name = "PaintingNeedsGpuError";
-  }
-}
-
 function describeError(error: unknown): string {
   if (error instanceof UnsupportedDeviceError) {
     return "This browser or device can't run the model. Try the latest Chrome, Edge or Safari on a laptop or desktop.";
-  }
-  if (error instanceof PaintingNeedsGpuError) {
-    return "Painting pictures needs your graphics chip, and this browser can't reach it. Open Waylay in the latest Chrome, Edge or Safari to paint.";
   }
   const text = error instanceof Error ? error.message : String(error);
   if (/fetch|network|load failed|connection/i.test(text)) {

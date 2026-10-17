@@ -14,7 +14,7 @@ import { UserMenuContent } from "./user-menu";
    button's own overflow-hidden can't clip it — don't make the row
    `relative` or it will). */
 const ROW =
-  "flex h-full w-full cursor-pointer items-center gap-2.5 overflow-hidden px-2 py-2 text-left transition-colors before:absolute before:-inset-x-3 before:-top-1.5 before:-bottom-2 hover:bg-accent";
+  "flex h-full w-full cursor-pointer items-center gap-2.5 overflow-hidden rounded-lg px-2 py-2 text-left transition-colors before:absolute before:-inset-x-3 before:-top-1.5 before:-bottom-2 hover:bg-accent";
 
 /* Rail centering without the justify-center jump: the row stays
    left-anchored and the leading element glides the last few px into the
@@ -29,7 +29,7 @@ const FADE =
 function UserSkeleton() {
   return (
     <div className="flex h-full items-center gap-2.5 px-2 sidebar-collapsed:justify-center sidebar-collapsed:px-0">
-      <Skeleton className="size-8 animate-none"/>
+      <Skeleton className="size-8 animate-none rounded-full" />
       <div className="flex flex-col gap-1.5 sidebar-collapsed:hidden">
         <Skeleton className="h-3 w-20 animate-none" />
         <Skeleton className="h-2.5 w-12 animate-none" />

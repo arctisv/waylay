@@ -7,9 +7,9 @@
       animation: turn 2.4s cubic-bezier(0.55, 0, 0.3, 1) infinite;
     }
     @keyframes turn {
-      0% { translate: 0 0; rotate: 0deg; scale: 1; }
-      30% { translate: var(--dx) var(--dy); rotate: 45deg; scale: 1.18; }
-      60%, 100% { translate: 0 0; rotate: 90deg; scale: 1; }
+      0% { translate: 0 0; scale: 1; }
+      30% { translate: var(--dx) var(--dy); scale: 1.18; }
+      60%, 100% { translate: 0 0; scale: 1; }
     }
     .t0 { animation-delay: 0.000s; }
     .t1 { animation-delay: 0.045s; }
@@ -21,13 +21,13 @@
     .t7 { animation-delay: 0.315s; }
   </style>
   <g fill="black">
-  <rect class="t t0" style="--dx:0.00px;--dy:-7.00px" x="83.50" y="24.50" width="13.00" height="13.00" transform="rotate(0.0 90.00 31.00)"/>
-  <rect class="t t1" style="--dx:4.95px;--dy:-4.95px" x="124.43" y="40.57" width="16.00" height="16.00" transform="rotate(45.0 132.43 48.57)"/>
-  <rect class="t t2" style="--dx:7.00px;--dy:0.00px" x="140.50" y="81.50" width="19.00" height="19.00" transform="rotate(90.0 150.00 91.00)"/>
-  <rect class="t t3" style="--dx:4.95px;--dy:4.95px" x="121.43" y="122.43" width="22.00" height="22.00" transform="rotate(135.0 132.43 133.43)"/>
-  <rect class="t t4" style="--dx:0.00px;--dy:7.00px" x="77.50" y="138.50" width="25.00" height="25.00" transform="rotate(180.0 90.00 151.00)"/>
-  <rect class="t t5" style="--dx:-4.95px;--dy:4.95px" x="33.57" y="119.43" width="28.00" height="28.00" transform="rotate(225.0 47.57 133.43)"/>
-  <rect class="t t6" style="--dx:-7.00px;--dy:0.00px" x="14.50" y="75.50" width="31.00" height="31.00" transform="rotate(270.0 30.00 91.00)"/>
-  <rect class="t t7" style="--dx:-4.95px;--dy:-4.95px" x="30.57" y="31.57" width="34.00" height="34.00" transform="rotate(315.0 47.57 48.57)"/>
+  <circle class="t t0" style="--dx:0.00px;--dy:-7.00px" cx="90.00" cy="31.00" r="6.50"/>
+  <circle class="t t1" style="--dx:4.95px;--dy:-4.95px" cx="132.43" cy="48.57" r="8.00"/>
+  <circle class="t t2" style="--dx:7.00px;--dy:0.00px" cx="150.00" cy="91.00" r="9.50"/>
+  <circle class="t t3" style="--dx:4.95px;--dy:4.95px" cx="132.43" cy="133.43" r="11.00"/>
+  <circle class="t t4" style="--dx:0.00px;--dy:7.00px" cx="90.00" cy="151.00" r="12.50"/>
+  <circle class="t t5" style="--dx:-4.95px;--dy:4.95px" cx="47.57" cy="133.43" r="14.00"/>
+  <circle class="t t6" style="--dx:-7.00px;--dy:0.00px" cx="30.00" cy="91.00" r="15.50"/>
+  <circle class="t t7" style="--dx:-4.95px;--dy:-4.95px" cx="47.57" cy="48.57" r="17.00"/>
   </g>
 </svg>

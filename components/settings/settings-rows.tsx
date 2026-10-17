@@ -56,6 +56,13 @@ export function SettingsGroupHeader({
   );
 }
 
+/** A tile inside a SettingsCard: the panel's 30px less its 4px padding.
+ *  Rows, search rows and loose content in a card each wear one; what sits
+ *  12px inside a tile (icon wells, fields, choices) takes 26 − 12 = 14px. */
+export const SETTINGS_TILE = "rounded-4xl bg-surface";
+
+/* A tinted panel holding its rows as filled tiles, no rules between them:
+   the gaps and the tint do the separating. */
 export function SettingsCard({
   children,
   className,
@@ -66,7 +73,7 @@ export function SettingsCard({
   return (
     <section
       className={cn(
-        "divide-y divide-border border border-border",
+        "flex flex-col gap-1 rounded-[30px] bg-black/[0.035] p-1 dark:bg-white/[0.035]",
         className,
       )}
     >
@@ -76,7 +83,7 @@ export function SettingsCard({
 }
 
 /** A search field styled as a card row — drop it in as a SettingsCard's
- *  first child and the divider hairline comes free. Escape clears.
+ *  first child and it takes a tile of its own. Escape clears.
  *  `trailing` pins extra controls (a filter button) after the input. */
 export function SettingsSearchRow({
   value,
@@ -92,7 +99,7 @@ export function SettingsSearchRow({
   "aria-label"?: string;
 }) {
   return (
-    <div className="flex h-11 items-center gap-2.5 px-4">
+    <div className={cn("flex h-11 items-center gap-2.5 px-4", SETTINGS_TILE)}>
       <IconSearch size={16} className="shrink-0 text-muted-foreground" />
       <input
         value={value}
@@ -131,10 +138,10 @@ export function SettingsRow({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="p-4">
+    <div className={cn("p-3", SETTINGS_TILE)}>
       <div className="flex items-center gap-3">
         {(iconNode || RowIcon) && (
-          <span className="flex size-9 shrink-0 items-center justify-center bg-well text-foreground shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-well text-foreground">
             {iconNode ?? (RowIcon && <RowIcon size={18} />)}
           </span>
         )}

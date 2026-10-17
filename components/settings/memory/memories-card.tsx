@@ -9,6 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 import type { Memory, useMemories } from "@/lib/user-memory";
 import { ListPager } from "../list-pager";
 import {
+  SETTINGS_TILE,
   SettingsCard,
   SettingsGroupHeader,
   SettingsSearchRow,
@@ -34,9 +35,9 @@ function byPinnedThenRecent(a: Memory, b: Memory) {
 
 function MemorySkeletons() {
   return (
-    <div className="flex flex-col divide-y divide-border">
+    <div className="flex flex-col gap-1">
       {["w-4/5", "w-3/5", "w-2/3"].map((width, index) => (
-        <div key={index} className="flex flex-col gap-2 px-4 py-3.5">
+        <div key={index} className={`flex flex-col gap-2 px-4 py-3.5 ${SETTINGS_TILE}`}>
           <Skeleton className={`h-3.5 ${width}`} />
           <Skeleton className="h-3 w-20" />
         </div>
@@ -140,23 +141,23 @@ export function MemoriesCard({
         {memories === undefined ? (
           <MemorySkeletons />
         ) : error ? (
-          <div className="flex flex-wrap items-center justify-between gap-2 p-4">
+          <div className={`flex flex-wrap items-center justify-between gap-2 p-4 ${SETTINGS_TILE}`}>
             <p className="text-sm text-destructive">{error}</p>
             <Button variant="secondary" size="sm" onClick={() => void reload()}>
               Try again
             </Button>
           </div>
         ) : count === 0 ? (
-          <p className="p-4 text-sm text-muted-foreground">
+          <p className={`p-4 text-sm text-muted-foreground ${SETTINGS_TILE}`}>
             Nothing yet. Waylay picks memories up as you chat — or write the
             first one yourself.
           </p>
         ) : visible?.length === 0 ? (
-          <p className="p-4 text-sm text-muted-foreground">
+          <p className={`p-4 text-sm text-muted-foreground ${SETTINGS_TILE}`}>
             No memories match “{query.trim()}”.
           </p>
         ) : (
-          <ul className="flex flex-col divide-y divide-border">
+          <ul className="flex flex-col gap-1">
             {visible?.map((memory) => (
               <MemoryRow
                 key={memory.id}

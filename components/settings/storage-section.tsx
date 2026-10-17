@@ -1,31 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import {
-  IconCpu,
-  IconMicrophoneFilled,
-  IconPhotoFilled,
-  type Icon,
-} from "@tabler/icons-react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { IconMicrophoneFilled } from "@tabler/icons-react";
 
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { MakerLogo } from "@/components/icons/maker-logos";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { api } from "@/lib/local/api";
-import { IMAGE_MODEL } from "@/lib/local/inference/image-engine";
-import { CPU_MODEL, LOCAL_MODELS, type TextModelKey } from "@/lib/local/inference/models";
+import { LOCAL_MODELS } from "@/lib/local/inference/models";
 import { useMutation } from "@/lib/local/react";
 import { SPEECH_MODEL } from "@/lib/local/speech/model";
 import {
-  deleteModelDownload,
+  deleteGpuBuild,
   deleteRepoDownload,
   eraseEverything,
   formatBytes,
-  isModelDownloaded,
+  isGpuBuildDownloaded,
   isRepoDownloaded,
   storageEstimate,
 } from "@/lib/local/storage";
-import { CHAT_MODELS } from "@/lib/models";
 import { showToast } from "@/lib/toasts";
 import { ArmRemoveButton } from "./arm-remove-button";
 import {
@@ -35,10 +29,10 @@ import {
   SettingsRow,
 } from "./settings-rows";
 
-/** One downloadable model, as the Downloads card lists it. */
+/** One downloadable model build, as the Downloads card lists it. */
 type Download = {
   key: string;
-  icon: Icon;
+  icon: ReactNode;
   title: string;
   /** Short name for the delete button's label. */
   name: string;
@@ -47,50 +41,48 @@ type Download = {
   remove: () => Promise<void>;
 };
 
-const TEXT_KEYS = Object.keys(LOCAL_MODELS) as TextModelKey[];
+/* Every build a chat could have downloaded: the GPU one and, where there
+   is one, the processor one. Only what's on the device gets a row. */
+const MODEL_DOWNLOADS: Download[] = LOCAL_MODELS.flatMap((model) => {
+  const icon = <MakerLogo maker={model.maker} size={18} />;
+  const builds: Download[] = [];
+  if (model.gpu) {
+    builds.push({
+      key: `${model.key}:gpu`,
+      icon,
+      title: model.name,
+      name: model.name,
+      sizeMB: model.gpu.downloadMB,
+      isDownloaded: () => isGpuBuildDownloaded(model),
+      remove: () => deleteGpuBuild(model),
+    });
+  }
+  const cpu = model.cpu;
+  if (cpu) {
+    builds.push({
+      key: `${model.key}:cpu`,
+      icon,
+      title: `${model.name} · Processor`,
+      name: model.name,
+      sizeMB: cpu.downloadMB,
+      isDownloaded: () => isRepoDownloaded(cpu.repo),
+      remove: () => deleteRepoDownload(cpu.repo),
+    });
+  }
+  return builds;
+});
 
-const DOWNLOADS: Download[] = [
-  ...TEXT_KEYS.map((key): Download => {
-    const local = LOCAL_MODELS[key];
-    const chatModel = CHAT_MODELS.find((model) => model.key === key)!;
-    return {
-      key,
-      icon: chatModel.icon,
-      title: `${chatModel.name} · ${local.label}`,
-      name: chatModel.name,
-      sizeMB: local.downloadMB,
-      isDownloaded: () => isModelDownloaded(local),
-      remove: () => deleteModelDownload(local),
-    };
-  }),
-  {
-    key: "image",
-    icon: IconPhotoFilled,
-    title: `Image · ${IMAGE_MODEL.label}`,
-    name: "image model",
-    sizeMB: IMAGE_MODEL.downloadMB,
-    isDownloaded: () => isRepoDownloaded(IMAGE_MODEL.repo),
-    remove: () => deleteRepoDownload(IMAGE_MODEL.repo),
-  },
-  {
-    key: "cpu",
-    icon: IconCpu,
-    title: `Processor · ${CPU_MODEL.label}`,
-    name: "processor model",
-    sizeMB: CPU_MODEL.downloadMB,
-    isDownloaded: () => isRepoDownloaded(CPU_MODEL.repo),
-    remove: () => deleteRepoDownload(CPU_MODEL.repo),
-  },
-  {
-    key: "voice",
-    icon: IconMicrophoneFilled,
-    title: `Voice · ${SPEECH_MODEL.label}`,
-    name: "voice model",
-    sizeMB: SPEECH_MODEL.downloadMB,
-    isDownloaded: () => isRepoDownloaded(SPEECH_MODEL.repo),
-    remove: () => deleteRepoDownload(SPEECH_MODEL.repo),
-  },
-];
+const VOICE: Download = {
+  key: "voice",
+  icon: <IconMicrophoneFilled size={18} />,
+  title: `Voice · ${SPEECH_MODEL.label}`,
+  name: "voice model",
+  sizeMB: SPEECH_MODEL.downloadMB,
+  isDownloaded: () => isRepoDownloaded(SPEECH_MODEL.repo),
+  remove: () => deleteRepoDownload(SPEECH_MODEL.repo),
+};
+
+const DOWNLOADS = [...MODEL_DOWNLOADS, VOICE];
 
 /** Which models are on the device, and how much space the site uses. */
 async function readStorage() {
@@ -106,11 +98,11 @@ async function readStorage() {
   };
 }
 
-/* Downloads and data, all of it in this browser. Each model shows whether
-   it's on the device and can be deleted to free space — it downloads again
-   the next time it's needed. */
+/* Downloads and data, all of it in this browser. Each downloaded model can
+   be deleted to free space — it downloads again the next time it's
+   needed. */
 export function StorageSection() {
-  const [downloaded, setDownloaded] = useState<Record<string, boolean>>({});
+  const [downloaded, setDownloaded] = useState<Record<string, boolean> | null>(null);
   const [usage, setUsage] = useState<{ usage: number; quota: number } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<"chats" | "everything" | null>(null);
@@ -143,14 +135,14 @@ export function StorageSection() {
 
   const status = (download: Download) => {
     const size = formatBytes(download.sizeMB * 1024 * 1024);
-    const state = downloaded[download.key];
+    const state = downloaded?.[download.key];
     if (state === undefined) return size;
     return state ? `${size} · On this device` : `${size} · Downloads when used`;
   };
 
   const removeControl = (download: Download) => {
     if (busy === download.key) return <Spinner />;
-    if (!downloaded[download.key]) return null;
+    if (!downloaded?.[download.key]) return null;
     return (
       <ArmRemoveButton
         label={download.name}
@@ -178,15 +170,29 @@ export function StorageSection() {
             }
           />
           <SettingsCard>
-            {DOWNLOADS.map((download) => (
+            {MODEL_DOWNLOADS.filter((download) => downloaded?.[download.key]).map(
+              (download) => (
+                <SettingsRow
+                  key={download.key}
+                  iconNode={download.icon}
+                  title={download.title}
+                  description={status(download)}
+                  control={removeControl(download)}
+                />
+              ),
+            )}
+            {downloaded && !MODEL_DOWNLOADS.some((download) => downloaded[download.key]) && (
               <SettingsRow
-                key={download.key}
-                icon={download.icon}
-                title={download.title}
-                description={status(download)}
-                control={removeControl(download)}
+                title="No chat models yet"
+                description="A model downloads the first time you chat with it."
               />
-            ))}
+            )}
+            <SettingsRow
+              iconNode={VOICE.icon}
+              title={VOICE.title}
+              description={status(VOICE)}
+              control={removeControl(VOICE)}
+            />
           </SettingsCard>
         </div>
 
@@ -197,7 +203,7 @@ export function StorageSection() {
               title="Delete all chats"
               description="Every conversation and folder. Memories and settings stay."
               control={
-                <Button variant="outline" size="sm" onClick={() => setConfirming("chats")}>
+                <Button variant="secondary" size="sm" onClick={() => setConfirming("chats")}>
                   Delete all
                 </Button>
               }

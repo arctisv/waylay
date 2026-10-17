@@ -62,7 +62,7 @@ export function PreferencesField() {
         rows={5}
         maxLength={MAX_PREFERENCES_LENGTH}
         placeholder="e.g. I'm a med student, keep explanations short, no emojis please"
-        className="w-full resize-y bg-well px-3 py-2.5 text-[13px]/5 shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)] outline-none transition-shadow placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+        className="w-full resize-y rounded-xl bg-well px-3 py-2.5 text-[13px]/5 outline-none transition-colors placeholder:text-muted-foreground focus-visible:bg-[color-mix(in_oklch,var(--well),var(--foreground)_6%)] disabled:opacity-60"
       />
       {text !== null && text.length >= MAX_PREFERENCES_LENGTH - 200 && (
         <p className="mt-1 text-right text-[11px]/4 tabular-nums text-muted-foreground">

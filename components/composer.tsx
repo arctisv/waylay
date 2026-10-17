@@ -122,7 +122,7 @@ export function Composer({
   onValueChange: (value: string) => void;
   model: string;
   onModelChange: SetModelPref;
-  /* `model` is a picker key ("Auto"/"Fast"/"Think"/"Max") — see
+  /* `model` is a picker key ("Auto", "qwen3-4b", …) — see
      lib/models.ts. A thrown rejection keeps the attachment tray intact for
      another go. */
   onSubmit: (
@@ -453,18 +453,14 @@ export function Composer({
     context: commandContext,
   });
 
-  /* Use a real border here instead of the shared inset highlight. Chromium
-     can flash the top edge of an inset shadow when this blurred pill sits
-     on a transformed floating dock.
-
-     The pill has two faces — the message bar and the voice face — that
+  /* The pill has two faces — the message bar and the voice face — that
      crossfade inside one height morph, so dictation starting (or ending)
      reshapes the capsule on a spring instead of a snap. The
      command palette lives outside the morph: its popup opens above the
      pill and must never be clipped by the morph's overflow-hidden. */
   return (
     <div
-      className={`relative border border-[var(--well-outline)] ${
+      className={`relative rounded-4xl ${
         floating
           ? "bg-(--well-translucent) backdrop-blur-xl"
           : "bg-well"
@@ -566,9 +562,7 @@ export function Composer({
                         });
                       }
                     }}
-                    placeholder={
-                      currentModel?.imageOutput ? "Describe a picture to paint" : placeholder
-                    }
+                    placeholder={placeholder}
                     className="relative block h-full w-full resize-none overflow-y-auto bg-transparent px-1.5 py-1.5 field-text caret-foreground outline-none placeholder:text-muted-foreground"
                   />
                 </motion.div>
@@ -650,7 +644,7 @@ export function Composer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15, ease: "linear" }}
-            className="pointer-events-none fixed inset-3 z-50 flex items-center justify-center border-2 border-dashed border-foreground/25 bg-background/70 backdrop-blur-sm"
+            className="pointer-events-none fixed inset-3 z-50 flex items-center justify-center rounded-4xl bg-background/80 backdrop-blur-sm"
           >
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <IconCloudUpload size={28} stroke={1.8} />

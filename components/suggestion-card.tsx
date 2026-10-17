@@ -15,8 +15,7 @@ const LINE_HEIGHT = 18;
 const PADDING_Y = 9;
 
 /** The capsule's surface, shared with the silhouette in suggestion-cards. */
-export const CAPSULE_SURFACE =
-  "bg-well shadow-[inset_0_0_0_1px_var(--well-outline),inset_0_1px_0_0_var(--well-highlight)]";
+export const CAPSULE_SURFACE = "rounded-full bg-well";
 
 const OPEN_TRANSITION = { duration: 0.26, ease: [0.22, 1, 0.36, 1] } as const;
 
@@ -171,9 +170,9 @@ export function SuggestionCard({
            and the X hold their exact collapsed positions while the rest is
            revealed from under the closing edge. */
         className={cn(
-          "group absolute inset-x-0 top-0 flex h-9 w-full items-start overflow-hidden ring-1 ring-transparent transition-[background-color,box-shadow] duration-150",
+          "group absolute inset-x-0 top-0 flex h-9 w-full items-start overflow-hidden transition-[background-color] duration-150",
           CAPSULE_SURFACE,
-          "hover:bg-[color-mix(in_oklch,var(--well),var(--foreground)_5%)] hover:ring-border",
+          "hover:bg-[color-mix(in_oklch,var(--well),var(--foreground)_5%)]",
           raised ? "z-10" : "z-0",
         )}
       >
@@ -238,7 +237,7 @@ export function SuggestionCard({
             /* `scale` is named in the transition list on purpose: Tailwind v4
                compiles it to the standalone `scale` property, which a
                `transform` entry would not cover. */
-            "mt-1.5 mr-2 flex size-6 shrink-0 cursor-pointer items-center justify-center text-muted-foreground/55 transition-[color,background-color,opacity,scale] duration-150 hover:bg-foreground/[0.06] hover:text-foreground active:scale-90 dark:hover:bg-foreground/[0.1]",
+            "mt-1.5 mr-2 flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-muted-foreground/55 transition-[color,background-color,opacity,scale] duration-150 hover:bg-foreground/[0.06] hover:text-foreground active:scale-90 dark:hover:bg-foreground/[0.1]",
             /* Hidden only while THIS card is a placeholder — there is nothing
                to turn down yet. It used to vanish whenever either card was
                loading, which meant both X's faded out and back on every cold

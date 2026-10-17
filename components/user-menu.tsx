@@ -61,7 +61,7 @@ function StorageBlock() {
           <Skeleton className="h-3.5 w-14" />
           <Skeleton className="h-3 w-20" />
         </div>
-        <Skeleton className="mt-2 h-1.5 w-full"/>
+        <Skeleton className="mt-2 h-1.5 w-full rounded-full" />
         <div className="mt-1.5 flex items-center justify-between">
           <Skeleton className="h-2.5 w-16" />
           <Skeleton className="h-2.5 w-12" />

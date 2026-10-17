@@ -3,6 +3,7 @@
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
+import { SETTINGS_TILE } from "./settings-rows";
 
 /* The pager that sits as a card's last row — a quiet "Page 2 of 7" on the
    left, arrows on the right. Renders nothing when there's only one page, so
@@ -21,7 +22,7 @@ export function ListPager({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between gap-2 px-4 py-2.5">
+    <div className={`flex items-center justify-between gap-2 px-4 py-2.5 ${SETTINGS_TILE}`}>
       <span className="text-[12.5px] tabular-nums text-muted-foreground">
         Page {page} of {totalPages}
       </span>
