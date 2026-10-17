@@ -1,0 +1,37 @@
+.mark {
+  position: absolute;
+  right: -6vw;
+  bottom: -4vw;
+  width: min(62vw, 860px);
+  height: auto;
+  pointer-events: none;
+}
+
+.stroke {
+  stroke-dasharray: 1 2;
+  animation: draw 1.8s var(--ease-out) both;
+}
+
+.late {
+  animation-delay: 0.3s;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1.001;
+  }
+}
+
+@media (max-width: 720px) {
+  .mark {
+    right: -34vw;
+    bottom: -10vw;
+    width: 128vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stroke {
+    animation: none;
+  }
+}

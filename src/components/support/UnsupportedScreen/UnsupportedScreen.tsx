@@ -2,43 +2,25 @@ import type { ReactNode } from 'react';
 import styles from './UnsupportedScreen.module.css';
 
 interface UnsupportedScreenProps {
-  illustration: ReactNode;
-  eyebrow: string;
   title: string;
   description: string;
-  listTitle: string;
-  list: ReactNode;
-  hint: string;
+  details: ReactNode;
   actions: ReactNode;
 }
 
 /** Shared layout for every "Waylay can't run here" screen. */
-export function UnsupportedScreen({
-  illustration,
-  eyebrow,
-  title,
-  description,
-  listTitle,
-  list,
-  hint,
-  actions,
-}: UnsupportedScreenProps) {
+export function UnsupportedScreen({ title, description, details, actions }: UnsupportedScreenProps) {
   return (
-    <div className={styles.screen}>
+    <section className={styles.screen}>
       <div className={styles.inner}>
         <div className={styles.intro}>
-          {illustration}
-          <p className={styles.eyebrow}>{eyebrow}</p>
+          <p className={styles.status}>Not compatible</p>
           <h1 className={styles.title}>{title}</h1>
           <p className={styles.description}>{description}</p>
         </div>
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>{listTitle}</h2>
-          {list}
-          <p className={styles.hint}>{hint}</p>
-        </section>
-        {actions}
+        <div className={styles.details}>{details}</div>
+        <div className={styles.actions}>{actions}</div>
       </div>
-    </div>
+    </section>
   );
 }

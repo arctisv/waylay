@@ -10,7 +10,7 @@ export function SupportGate() {
   const { report, rechecking, recheck } = useDeviceSupport();
 
   return (
-    <AppShell status={report.status}>
+    <AppShell>
       {report.status === 'unsupported-browser' ? (
         <BrowserUnsupported onRecheck={recheck} rechecking={rechecking} />
       ) : report.status === 'unsupported-device' ? (

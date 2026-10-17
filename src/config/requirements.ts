@@ -8,11 +8,11 @@ export const requirements = {
   minGpuBufferMB: 256,
 } as const;
 
-/** Browsers that ship WebGPU. */
+/** Browsers that ship WebGPU on both desktop and mobile, with the first version that has it everywhere. */
 export const supportedBrowsers = [
-  { name: 'Chrome & Edge', detail: '113+ on desktop, 121+ on Android' },
-  { name: 'Safari', detail: '26+ on Mac, iPhone and iPad' },
-  { name: 'Firefox', detail: '141+ on Windows' },
+  { name: 'Chrome', version: '121' },
+  { name: 'Edge', version: '121' },
+  { name: 'Safari', version: '26' },
 ] as const;
 
 /** Sample reports for previewing each screen with `?preview=browser` or `?preview=device`. */

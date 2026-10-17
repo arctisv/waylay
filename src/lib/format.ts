@@ -6,5 +6,5 @@ export function formatMegabytes(mb: number): string {
 
 /** Formats `navigator.deviceMemory`, which browsers cap at 8. */
 export function formatMemory(gb: number): string {
-  return gb >= 8 ? '8 GB or more' : `${gb} GB`;
+  return gb >= 8 ? '8 GB+' : `${gb} GB`;
 }

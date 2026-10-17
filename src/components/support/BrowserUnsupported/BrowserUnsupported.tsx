@@ -1,6 +1,5 @@
-import { BrowserBlockedIllustration } from '@/components/icons';
 import { supportedBrowsers } from '@/config/requirements';
-import { RequirementList } from '../RequirementList/RequirementList';
+import { SpecGrid } from '../SpecGrid/SpecGrid';
 import { SupportActions } from '../SupportActions/SupportActions';
 import { UnsupportedScreen } from '../UnsupportedScreen/UnsupportedScreen';
 
@@ -12,22 +11,17 @@ interface BrowserUnsupportedProps {
 export function BrowserUnsupported({ onRecheck, rechecking }: BrowserUnsupportedProps) {
   return (
     <UnsupportedScreen
-      illustration={<BrowserBlockedIllustration />}
-      eyebrow="Browser not supported"
-      title="Your browser can’t run Waylay"
-      description="Waylay runs the AI on your own graphics chip using WebGPU. This browser doesn’t support WebGPU, so the model can’t start here."
-      listTitle="Open Waylay in one of these"
-      list={
-        <RequirementList
+      title="This browser can’t run Waylay."
+      description="Waylay runs the AI on your own graphics chip with WebGPU, which this browser doesn’t support. Open it in one of these instead."
+      details={
+        <SpecGrid
           items={supportedBrowsers.map((browser) => ({
             id: browser.name,
-            label: browser.name,
-            detail: browser.detail,
-            tone: 'info',
+            value: browser.name,
+            note: `${browser.version} or later`,
           }))}
         />
       }
-      hint="Already using one of these? Update it to the latest version, then check again."
       actions={<SupportActions onRecheck={onRecheck} rechecking={rechecking} />}
     />
   );

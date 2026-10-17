@@ -1,31 +1,15 @@
 .actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .actions > * {
-  flex: 1 1 180px;
-}
-
-.spin {
-  animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .spin {
-    animation: none;
-  }
+  flex: 1 1 0;
 }
 
 @media (min-width: 561px) {
   .actions > * {
     flex: 0 0 auto;
+    min-width: 152px;
   }
 }

@@ -3,8 +3,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 48px;
-  padding-inline: 22px;
+  height: 52px;
+  padding-inline: 26px;
   border-radius: var(--radius-pill);
   font-size: 0.9375rem;
   font-weight: 600;

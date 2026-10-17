@@ -17,8 +17,8 @@ Then open http://localhost:3000.
 
 The app checks the device on load and shows the matching screen. To see a specific one, add `?preview=` to the URL:
 
-- `?preview=browser` shows "Your browser can't run Waylay"
-- `?preview=device` shows "This device needs a bit more power"
+- `?preview=browser` shows "This browser can't run Waylay."
+- `?preview=device` shows "This device can't run Waylay."
 
 ## Scripts
 
@@ -38,12 +38,12 @@ src/
   app/            Next.js routes, metadata, manifest and generated icons
   assets/brand/   Source SVGs for the app icon
   components/
-    brand/        App icon and logo
-    icons/        Custom SVG glyphs and illustrations
+    brand/        App icon, logo and the backdrop mark
+    icons/        Custom SVG glyphs
     layout/       App shell and header
     pwa/          Service worker registration
     support/      Device check and the "can't run here" screens
-    ui/           Buttons and status pill
+    ui/           Buttons
   config/         Site text, feature flags, device requirements and supported browsers
   hooks/          Device check and clipboard hooks
   lib/            Device detection and formatting helpers

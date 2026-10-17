@@ -1,21 +1,20 @@
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  position: relative;
   padding-top: env(safe-area-inset-top, 0px);
-  background: var(--color-bg-glass);
-  -webkit-backdrop-filter: saturate(1.8) blur(14px);
-  backdrop-filter: saturate(1.8) blur(14px);
+  padding-left: var(--gutter-left);
+  padding-right: var(--gutter-right);
 }
 
 .inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  max-width: 1120px;
-  height: 64px;
+  max-width: var(--container);
+  height: 88px;
   margin-inline: auto;
-  padding-left: var(--gutter-left);
-  padding-right: var(--gutter-right);
+}
+
+@media (max-width: 560px) {
+  .inner {
+    height: 72px;
+  }
 }

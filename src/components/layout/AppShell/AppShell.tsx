@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
+import { BrandMark } from '@/components/brand/BrandMark/BrandMark';
 import { Header } from '@/components/layout/Header/Header';
-import type { SupportStatus } from '@/lib/device/types';
 import styles from './AppShell.module.css';
 
-export function AppShell({ status, children }: { status: SupportStatus; children: ReactNode }) {
+export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className={styles.shell}>
-      <Header status={status} />
+      <BrandMark />
+      <Header />
       <main className={styles.main}>{children}</main>
     </div>
   );

@@ -1,38 +1,26 @@
-/* Light only: a white canvas, near-black ink and one periwinkle accent taken from the logo. */
+/* Light only: a white canvas, near-black ink, muted fills and one periwinkle accent taken from the logo. */
 :root {
   --color-bg: #ffffff;
-  --color-bg-glass: rgb(255 255 255 / 0.86);
-  --color-bg-fade: rgb(255 255 255 / 0);
   --color-ink: #0e1014;
   --color-ink-hover: #272b33;
   --color-ink-2: #4b505c;
   --color-ink-3: #8a8f9b;
-  --color-line: #eceef2;
-  --color-line-strong: #dcdfe5;
   --color-surface: #f6f7f9;
   --color-surface-2: #eef0f3;
-  --color-accent: #5566f2;
   --color-accent-soft: #eef0ff;
-  --color-ok: #16a05b;
-  --color-ok-soft: #e7f6ee;
   --color-bad: #e5484d;
-  --color-bad-soft: #fdeced;
 
   --font-display: var(--font-manrope), "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --font-body: var(--font-instrument), "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  --radius-s: 10px;
-  --radius-m: 16px;
-  --radius-l: 24px;
+  --radius-m: 20px;
   --radius-pill: 999px;
 
-  --shadow-float: 0 1px 2px rgb(14 16 20 / 0.04), 0 12px 32px -8px rgb(14 16 20 / 0.12);
-  --shadow-icon: 0 10px 24px -10px rgb(14 16 20 / 0.45);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --gutter-left: max(16px, env(safe-area-inset-left, 0px));
-  --gutter-right: max(16px, env(safe-area-inset-right, 0px));
-  --content-width: 720px;
+  --gutter-left: max(20px, env(safe-area-inset-left, 0px));
+  --gutter-right: max(20px, env(safe-area-inset-right, 0px));
+  --container: 1200px;
 
   color-scheme: light only;
   background: var(--color-bg);

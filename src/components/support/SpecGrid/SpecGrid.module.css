@@ -1,0 +1,45 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 8px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 18px 20px;
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+}
+
+.label {
+  margin-bottom: 8px;
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+.value {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.short {
+  color: var(--color-bad);
+}
+
+.note {
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 560px) {
+  .item {
+    padding: 16px;
+  }
+}

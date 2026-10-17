@@ -1,10 +1,13 @@
 .shell {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+  overflow: clip;
 }
 
 .main {
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
