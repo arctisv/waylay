@@ -1,5 +1,5 @@
-"""Writes Waylay's mark: ten square tiles on a circle, growing from a
-pinprick at the top to the largest just before it, each turned to face the
+"""Writes Waylay's mark: eight square tiles on a circle, growing from a
+small tile at the top to the largest just before it, each turned to face the
 center. Run `python3 scripts/generate-mark.py && npm run icons` after
 changing it. Outputs the static mark, its mask layers, the favicon and the
 animated version used for hovers and the activity spinner."""
@@ -9,9 +9,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CX, CY = 90, 91
-RADIUS = 64
-COUNT = 10
-SMALLEST, LARGEST = 8, 28
+RADIUS = 60
+COUNT = 8
+SMALLEST, LARGEST = 13, 34
 
 
 def tiles():

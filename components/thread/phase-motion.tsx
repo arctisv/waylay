@@ -4,8 +4,8 @@ import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { TextMorph } from "torph/react";
 
-import { publicPath } from "@/lib/base-path";
 import { EASE_OUT } from "@/lib/motion";
+import { MarkRings } from "../mark-rings";
 
 const PHASE_SHIMMER_DURATION_MS = 720;
 
@@ -176,16 +176,12 @@ export function PhaseIcon({
   );
 }
 
-/** The animated mark is the spinner itself; its opacity stays steady while
+/** The mark is the spinner itself — the logo's own breathing turn — while
  * the neighboring label carries the traveling shimmer. */
 export function MarkActivityIcon() {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={publicPath("/brand/mark-animate.svg")}
-      alt=""
-      draggable={false}
-      className="size-[26px] max-w-none dark:invert"
-    />
+    <span className="relative block size-[17px]">
+      <MarkRings spin layers={[{ className: "bg-foreground" }]} />
+    </span>
   );
 }

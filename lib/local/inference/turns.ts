@@ -200,6 +200,12 @@ async function runTurn(turn: Turn): Promise<void> {
     }
 
     const conversation = buildConversation(turn.threadId, message, runtime);
+    if (asked && rememberedId) {
+      conversation[0] = {
+        role: "system",
+        content: `${conversation[0].content}\n\nYou just saved this to memory about them: "${asked}" Confirm it in a few words, speaking to them as "you".`,
+      };
+    }
     let result = await generate({ engine, turn, message, runtime, conversation, phases, tools: true });
     outputTokens += result.completionTokens ?? 0;
 

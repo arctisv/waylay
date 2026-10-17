@@ -1,15 +1,13 @@
 <svg width="180" height="182" viewBox="0 0 180 182" fill="none" xmlns="http://www.w3.org/2000/svg">
 <style>g{fill:#000}@media (prefers-color-scheme: dark){g{fill:#fff}}</style>
 <g>
-  <rect x="86.00" y="23.00" width="8.00" height="8.00" transform="rotate(0.0 90.00 27.00)"/>
-  <rect x="122.51" y="34.11" width="10.22" height="10.22" transform="rotate(36.0 127.62 39.22)"/>
-  <rect x="144.65" y="65.00" width="12.44" height="12.44" transform="rotate(72.0 150.87 71.22)"/>
-  <rect x="143.53" y="103.44" width="14.67" height="14.67" transform="rotate(108.0 150.87 110.78)"/>
-  <rect x="119.17" y="134.33" width="16.89" height="16.89" transform="rotate(144.0 127.62 142.78)"/>
-  <rect x="80.44" y="145.44" width="19.11" height="19.11" transform="rotate(180.0 90.00 155.00)"/>
-  <rect x="41.72" y="132.11" width="21.33" height="21.33" transform="rotate(216.0 52.38 142.78)"/>
-  <rect x="17.35" y="99.00" width="23.56" height="23.56" transform="rotate(252.0 29.13 110.78)"/>
-  <rect x="16.24" y="58.33" width="25.78" height="25.78" transform="rotate(288.0 29.13 71.22)"/>
-  <rect x="38.38" y="25.22" width="28.00" height="28.00" transform="rotate(324.0 52.38 39.22)"/>
+  <rect x="83.50" y="24.50" width="13.00" height="13.00" transform="rotate(0.0 90.00 31.00)"/>
+  <rect x="124.43" y="40.57" width="16.00" height="16.00" transform="rotate(45.0 132.43 48.57)"/>
+  <rect x="140.50" y="81.50" width="19.00" height="19.00" transform="rotate(90.0 150.00 91.00)"/>
+  <rect x="121.43" y="122.43" width="22.00" height="22.00" transform="rotate(135.0 132.43 133.43)"/>
+  <rect x="77.50" y="138.50" width="25.00" height="25.00" transform="rotate(180.0 90.00 151.00)"/>
+  <rect x="33.57" y="119.43" width="28.00" height="28.00" transform="rotate(225.0 47.57 133.43)"/>
+  <rect x="14.50" y="75.50" width="31.00" height="31.00" transform="rotate(270.0 30.00 91.00)"/>
+  <rect x="30.57" y="31.57" width="34.00" height="34.00" transform="rotate(315.0 47.57 48.57)"/>
 </g>
 </svg>
