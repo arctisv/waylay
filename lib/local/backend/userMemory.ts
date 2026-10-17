@@ -5,7 +5,8 @@ import type { MemoryRow } from "../schema";
 /* Long-term memory, kept on this device. The model saves memories with its
    remember tool; Settings → Memory lists, edits and forgets them. */
 
-const MAX_MEMORY_LENGTH = 300;
+/* Every memory rides in the system prompt, so each stays short. */
+export const MAX_MEMORY_LENGTH = 300;
 
 export type MemoryEntry = {
   id: string;

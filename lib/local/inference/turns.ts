@@ -7,6 +7,7 @@ import type {
 } from "@mlc-ai/web-llm";
 
 import type { MessagePhase } from "@/lib/messages";
+import { MAX_MEMORY_LENGTH } from "../backend/userMemory";
 import { createId, db } from "../db";
 import { getDeviceSupport } from "../device/support";
 import type { AttachmentRow, MessageRow, SendOptions } from "../schema";
@@ -436,7 +437,7 @@ async function generate({
 
 function saveMemory(fact: string, threadId: string): string | null {
   if (!memoryEnabled(db)) return null;
-  const text = fact.trim().slice(0, 300);
+  const text = fact.trim().slice(0, MAX_MEMORY_LENGTH);
   const existing = db.all("memories").find((memory) => memory.memory.toLowerCase() === text.toLowerCase());
   if (existing) return existing._id;
   const now = Date.now();

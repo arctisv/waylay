@@ -8,6 +8,7 @@ import { DialogTrigger } from "@/components/ui/dialog";
 import { SearchModal } from "@/components/search-modal";
 import { ThreadList } from "@/components/thread-list";
 import { UserButton } from "@/components/user-button";
+import { useThreads } from "@/lib/threads";
 import { useView } from "@/lib/view";
 
 /* The rail, as a page.
@@ -24,8 +25,9 @@ import { useView } from "@/lib/view";
  * the rail is already showing this. */
 export function HistoryView() {
   const { openHome } = useView();
-  const { isAuthenticated, isLoading } = useLocalSession();
-  const signedOut = !isLoading && !isAuthenticated;
+  const { isAuthenticated } = useLocalSession();
+  const threads = useThreads(isAuthenticated);
+  const empty = threads !== undefined && threads.length === 0;
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
@@ -66,9 +68,9 @@ export function HistoryView() {
           onNavigate has nothing to close — the route change is the
           navigation. */}
       <div className="flex min-h-0 flex-1 flex-col">
-        {signedOut ? (
+        {empty ? (
           <p className="mt-10 px-1.5 text-center text-[13.5px]/5 text-muted-foreground">
-            Your chats show up here once you&rsquo;re signed in.
+            Your chats show up here once you start one.
           </p>
         ) : (
           <ThreadList />

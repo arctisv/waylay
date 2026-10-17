@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAction } from "@/lib/local/react";
 import { errorText, type FunctionReturnType } from "@/lib/local/functions";
 import { api } from "@/lib/local/api";
+import { MAX_MEMORY_LENGTH } from "@/lib/local/backend/userMemory";
 
 
 /* Client bindings for the Memory settings tab. Memories are read through
@@ -13,9 +14,8 @@ import { api } from "@/lib/local/api";
    first so it never waits on the write — a failure puts the old row back
    and rethrows, and the calling card turns that into a toast. */
 
-/* The editor's cap; the backend trims to its own MAX_MEMORY_LENGTH
-   (lib/local/backend/userMemory.ts). */
-export const MAX_MEMORY_CONTENT = 1_000;
+/* The editor's cap: the same limit the backend keeps. */
+export const MAX_MEMORY_CONTENT = MAX_MEMORY_LENGTH;
 
 export type Memory = FunctionReturnType<
   typeof api.userMemory.listMemories
