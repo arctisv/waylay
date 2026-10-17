@@ -1,7 +1,7 @@
 .list {
-  overflow: hidden;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-m);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .row {
@@ -9,10 +9,8 @@
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-}
-
-.row + .row {
-  border-top: 1px solid var(--color-line);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
 }
 
 .status {

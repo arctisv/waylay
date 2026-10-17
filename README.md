@@ -2,7 +2,7 @@
 
 A private AI chat that runs entirely in the browser. The model runs on the visitor's own device through WebGPU, so there is no server and nothing typed ever leaves the device.
 
-This is the first step: the empty chat screen and the screens shown when a browser or device can't run a model. Chatting isn't built yet.
+This is the first step: the screens shown when a browser or device can't run a model. Chat isn't built yet, so every visitor currently lands on one of these screens (see `src/config/features.ts`).
 
 ## Getting started
 
@@ -17,7 +17,6 @@ Then open http://localhost:3000.
 
 The app checks the device on load and shows the matching screen. To see a specific one, add `?preview=` to the URL:
 
-- `?preview=ready` shows the empty chat
 - `?preview=browser` shows "Your browser can't run Waylay"
 - `?preview=device` shows "This device needs a bit more power"
 
@@ -40,14 +39,13 @@ src/
   assets/brand/   Source SVGs for the app icon
   components/
     brand/        App icon and logo
-    chat/         Empty chat screen, prompt suggestions and composer
     icons/        Custom SVG glyphs and illustrations
     layout/       App shell and header
     pwa/          Service worker registration
     support/      Device check and the "can't run here" screens
     ui/           Buttons and status pill
-  config/         Site text, device requirements and supported browsers
-  hooks/          Device check, clipboard and textarea hooks
+  config/         Site text, feature flags, device requirements and supported browsers
+  hooks/          Device check and clipboard hooks
   lib/            Device detection and formatting helpers
   styles/         Global styles, design tokens and fonts
 public/

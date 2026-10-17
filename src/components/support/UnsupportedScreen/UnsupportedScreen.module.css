@@ -28,11 +28,12 @@
 }
 
 .eyebrow {
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-bad-soft);
   color: var(--color-bad);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .title {
@@ -56,11 +57,9 @@
 
 .sectionTitle {
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 0.9375rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-ink-3);
+  color: var(--color-ink-2);
 }
 
 .hint {
